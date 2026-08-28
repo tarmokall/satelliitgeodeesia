@@ -73,6 +73,8 @@ header.mast{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom
   letter-spacing:.08em;text-transform:uppercase;margin-top:6px;
 }
 main p{max-width:68ch}
+main a{color:var(--accent-ink);text-decoration-color:var(--line)}
+main a:hover{text-decoration-color:var(--accent-ink)}
 h2{
   font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
   color:var(--muted);margin:34px 0 12px;
@@ -123,11 +125,22 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
 
 <h2>Materjalid</h2>
 <p>Loengukonspektid, praktikumide juhendid ja andmefailid lisatakse siia jooksvalt semestri vältel.</p>
-<div class="edit">Lisa siia lingid oma materjalidele — PDF-failid võid panna samasse GitHubi repositooriumisse (nt kausta <code>materjalid/</code>) ja linkida kujul <code>&lt;a href="materjalid/loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
+<div class="edit">Täiendamisel
+  #Lisa siia lingid oma materjalidele — PDF-failid võid panna samasse GitHubi repositooriumisse (nt kausta <code>materjalid/</code>) ja linkida kujul <code>&lt;a href="materjalid/loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
 
 <h2>Kontakt</h2>
-<p>Õppejõud: Tarmo — küsimused loengus, praktikumis või e-posti teel.</p>
-<div class="edit">Täienda oma ametinime, e-posti aadressi ja vastuvõtuaegadega.</div>
+<p>Õppejõud: Tarmo Kall — küsimused loengus, praktikumis või e-posti teel.</p>
+<p id="epost"><noscript>E-post: tarmo.kall [at] emu [dot] ee</noscript></p>
+<script>
+(function(){
+  var p = ["tarmo", "kall"];        // aadressi osad enne @-märki
+  var d = ["emu", "ee"];            // domeeni osad
+  var a = p.join(".") + "@" + d.join(".");
+  document.getElementById("epost").innerHTML =
+    'E-post: <a href="mailto:' + a + '">' + a + "</a>";
+})();
+</script>
+<div class="edit">Täienda soovi korral ametinime ja vastuvõtuaegadega.</div>
 </main>
 
 <footer>Satelliitgeodeesia · õppeotstarbeline leht</footer>
