@@ -209,7 +209,7 @@ footer code{font-family:"IBM Plex Mono",monospace;font-size:11.5px}
   <span class="course">Satelliitgeodeesia · GPS orbiidi kalkulaator</span>
 </header>
 
-<p class="lede">Sisesta RINEX 3.04 navigatsioonifailist selekteeritud <b>ühe GPS satelliidi</b> Kepleri orbiidi elemendid. Kalkulaator lahendab Kepleri võrrandi ja arvutab satelliidi ristkoordinaadid <b>ECEF (WGS84)</b> süsteemis, kuna λ on antud Greenwichi meridiaani suhtes.</p>
+<p class="lede">Sisesta RINEX navigatsioonifailist selekteeritud <b>ühe GPS satelliidi</b> Kepleri orbiidi elemendid. Kalkulaator lahendab Kepleri võrrandi ja arvutab satelliidi ristkoordinaadid <b>ECEF (WGS84)</b> süsteemis.</p>
 
 <div class="grid">
 
@@ -266,7 +266,7 @@ footer code{font-family:"IBM Plex Mono",monospace;font-size:11.5px}
   <p class="errmsg" id="errmsg"></p>
 
   <div class="note">
-    NB! RINEX 3.04 failis on antud <code>sqrtA</code> — pooltelje ruutjuur (√m). Siia sisesta
+    NB! RINEX failis on antud <code>sqrtA</code> — pooltelje ruutjuur (√m). Siia sisesta
     <code>a&nbsp;=&nbsp;sqrtA²</code>. Kümnendkohaeraldajana sobib nii punkt kui koma;
     eksponentkuju <code>2.656E7</code> on lubatud. Nurgad radiaanides, nagu RINEX-is.
   </div>
@@ -314,8 +314,7 @@ footer code{font-family:"IBM Plex Mono",monospace;font-size:11.5px}
   <code>Y = r(cos u·sin λ + sin u·cos λ·cos i)</code>,
   <code>Z = r·sin u·sin i</code>.
   Kuna λ on tõususõlme pikkus Greenwichi meridiaani suhtes, on tulemus otse Maaga kaasapöörlevas
-  ECEF (WGS84) süsteemis. Joonisel kujutatud orbiidijoon on sama elemendikomplekti pühkides
-  M = 0…2π — s.t orbiidi hetkeseis ECEF-is, Maa pöörlemist joonisel ei arvestata.
+  ECEF (WGS84) süsteemis. Joonise orbiidijoon on saadud muutes ainult keskmist anomaaliat M = 0…2π ja hoides ülejäänud elemendid (sh λ) muutumatuna — see näitab orbiidi ellipsi asendit konkreetsel ajahetkel; Maa pöörlemist orbiidijoone kujutamisel ei arvestata. Satelliidi arvutatud asukohta see ei mõjuta.
 </footer>
 </div>
 
