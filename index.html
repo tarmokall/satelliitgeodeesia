@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Satelliitgeodeesia</title>
+<meta name="description" content="Õppeaine Satelliitgeodeesia koduleht: teemad, materjalid ja arvutustööriistad.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f7f8;
+  --panel:#ffffff;
+  --panel2:#eef2f4;
+  --ink:#182028;
+  --muted:#5b6a74;
+  --line:#c7d0d6;
+  --accent:#0f7f8b;
+  --accent-ink:#0a6570;
+  --accent-soft:#e0eef0;
+  --sat:#d98e04;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1519;
+    --panel:#161e24;
+    --panel2:#1c262d;
+    --ink:#dde5ea;
+    --muted:#8fa0aa;
+    --line:#2a343c;
+    --accent:#3aa8b4;
+    --accent-ink:#5fc2cc;
+    --accent-soft:#12333a;
+    --sat:#e8a41c;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1519;
+  --panel:#161e24;
+  --panel2:#1c262d;
+  --ink:#dde5ea;
+  --muted:#8fa0aa;
+  --line:#2a343c;
+  --accent:#3aa8b4;
+  --accent-ink:#5fc2cc;
+  --accent-soft:#12333a;
+  --sat:#e8a41c;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:15.5px;
+  line-height:1.6;
+}
+.wrap{max-width:860px;margin:0 auto;padding:28px 20px 56px}
+.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;font-size:14px}
+.topnav .site{font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+.topnav a{color:var(--accent-ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+.topnav a:hover{border-bottom-color:var(--accent-ink)}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--accent)}
+
+header.mast{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:22px}
+.mast h1{
+  font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
+  font-weight:600;font-size:clamp(30px,5.5vw,44px);
+  margin:0;letter-spacing:.01em;text-wrap:balance;
+}
+.mast .sub{
+  font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted);
+  letter-spacing:.08em;text-transform:uppercase;margin-top:6px;
+}
+main p{max-width:68ch}
+h2{
+  font-size:13px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:34px 0 12px;
+  display:flex;align-items:center;gap:10px;
+}
+h2::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.toolcard{
+  display:block;
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  padding:18px 20px;margin-top:14px;
+  text-decoration:none;color:inherit;
+}
+.toolcard:hover{border-color:var(--accent)}
+.toolcard .t{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:16px;color:var(--accent-ink);
+}
+.toolcard .t::after{content:" →"}
+.toolcard .d{font-size:14px;color:var(--muted);margin-top:4px;max-width:65ch}
+
+.edit{
+  margin-top:10px;padding:10px 12px;
+  background:var(--panel2);border-left:3px solid var(--sat);border-radius:0 4px 4px 0;
+  font-size:13px;color:var(--muted);
+}
+footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html" aria-current="page">Avaleht</a><a href="kalkulaator.html">Kalkulaator</a></nav>
+
+<header class="mast">
+  <h1>Satelliitgeodeesia</h1>
+  <p class="sub">Õppeaine koduleht · loengumaterjalid ja tööriistad</p>
+</header>
+
+<main>
+<h2>Õppeainest</h2>
+<p>Õppeaine käsitleb satelliitidel põhinevaid geodeetilisi mõõtmis- ja positsioneerimismeetodeid: GNSS süsteemide (GPS, GLONASS, Galileo, BeiDou) ülesehitust, satelliitide orbiidimehaanikat, signaale ja vaatlussuurusi, koordinaat- ja ajasüsteeme ning GNSS vaatluste töötlemist geodeetilise täpsuse saavutamiseks.</p>
+<div class="edit">Toimeta see tutvustus oma ainekava järgi — lisa ainekood, maht (EAP), semester ja hindamise põhimõtted.</div>
+
+<h2>Tööriistad</h2>
+<a class="toolcard" href="kalkulaator.html">
+  <span class="t">Kepler → ECEF kalkulaator</span>
+  <p class="d">Arvuta GPS satelliidi WGS84 ristkoordinaadid XYZ Kepleri orbiidi elementidest (a, e, i, λ, ω, M), mis on selekteeritud RINEX 3.04 navigatsioonifailist. Kuvab ka vahetulemused ja pööratava 3D joonise satelliidi asukohast.</p>
+</a>
+
+<h2>Materjalid</h2>
+<p>Loengukonspektid, praktikumide juhendid ja andmefailid lisatakse siia jooksvalt semestri vältel.</p>
+<div class="edit">Lisa siia lingid oma materjalidele — PDF-failid võid panna samasse GitHubi repositooriumisse (nt kausta <code>materjalid/</code>) ja linkida kujul <code>&lt;a href="materjalid/loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
+
+<h2>Kontakt</h2>
+<p>Õppejõud: Tarmo — küsimused loengus, praktikumis või e-posti teel.</p>
+<div class="edit">Täienda oma ametinime, e-posti aadressi ja vastuvõtuaegadega.</div>
+</main>
+
+<footer>Satelliitgeodeesia · õppeotstarbeline leht</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kepler → ECEF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f5f7f8;
+  --panel:#ffffff;
+  --panel2:#eef2f4;
+  --ink:#182028;
+  --muted:#5b6a74;
+  --line:#c7d0d6;
+  --accent:#0f7f8b;
+  --accent-ink:#0a6570;
+  --accent-soft:#e0eef0;
+  --sat:#d98e04;
+  --err:#b3403a;
+  --canvas-bg:#0f1519;
+  --canvas-grid:#2a3740;
+  --canvas-axis:#8fa3ad;
+  --canvas-orbit:#3fb2be;
+  --canvas-sat:#f0a81e;
+  --canvas-text:#b8c6cd;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f1519;
+    --panel:#161e24;
+    --panel2:#1c262d;
+    --ink:#dde5ea;
+    --muted:#8fa0aa;
+    --line:#2a343c;
+    --accent:#3aa8b4;
+    --accent-ink:#5fc2cc;
+    --accent-soft:#12333a;
+    --sat:#e8a41c;
+    --err:#e07a72;
+    --canvas-bg:#0b1013;
+    --canvas-grid:#25313a;
+    --canvas-axis:#8fa3ad;
+    --canvas-orbit:#3fb2be;
+    --canvas-sat:#f0a81e;
+    --canvas-text:#b8c6cd;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f1519;
+  --panel:#161e24;
+  --panel2:#1c262d;
+  --ink:#dde5ea;
+  --muted:#8fa0aa;
+  --line:#2a343c;
+  --accent:#3aa8b4;
+  --accent-ink:#5fc2cc;
+  --accent-soft:#12333a;
+  --sat:#e8a41c;
+  --err:#e07a72;
+  --canvas-bg:#0b1013;
+  --canvas-grid:#25313a;
+  --canvas-axis:#8fa3ad;
+  --canvas-orbit:#3fb2be;
+  --canvas-sat:#f0a81e;
+  --canvas-text:#b8c6cd;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 56px}
+header.mast{
+  display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);
+  padding-bottom:14px;margin-bottom:8px;
+}
+.mast h1{
+  font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
+  font-weight:600;font-size:clamp(22px,3.4vw,30px);
+  margin:0;letter-spacing:.01em;text-wrap:balance;
+}
+.mast .course{
+  font-family:"IBM Plex Mono",monospace;font-size:12px;
+  color:var(--muted);letter-spacing:.08em;text-transform:uppercase;
+}
+p.lede{color:var(--muted);max-width:68ch;margin:10px 0 26px}
+p.lede b{color:var(--ink);font-weight:600}
+
+.grid{display:grid;grid-template-columns:minmax(340px,5fr) 7fr;gap:22px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+.panel{
+  background:var(--panel);border:1px solid var(--line);border-radius:6px;
+  padding:20px;
+}
+.panel h2{
+  font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin:0 0 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.panel h2::after{content:"";flex:1;height:1px;background:var(--line)}
+
+.field{display:grid;grid-template-columns:44px 1fr 58px;gap:10px;align-items:center;margin-bottom:12px}
+.sym{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:17px;
+  color:var(--accent-ink);text-align:center;
+  background:var(--accent-soft);border-radius:4px;padding:6px 0;
+}
+.fmid{min-width:0}
+.fmid label{display:block;font-size:12.5px;color:var(--muted);margin-bottom:3px}
+.fmid input{
+  width:100%;
+  font-family:"IBM Plex Mono",monospace;font-size:14.5px;
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);background:var(--panel2);
+  border:1px solid var(--line);border-radius:4px;
+  padding:7px 9px;
+}
+.fmid input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.fmid input.bad{border-color:var(--err);outline-color:var(--err)}
+.unit{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--muted)}
+
+.btnrow{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+button{
+  font:inherit;font-weight:600;font-size:14px;
+  border-radius:4px;padding:9px 18px;cursor:pointer;
+  border:1px solid transparent;
+}
+button.primary{background:var(--accent);color:#fff}
+button.primary:hover{filter:brightness(1.08)}
+button.ghost{background:transparent;color:var(--accent-ink);border-color:var(--line)}
+button.ghost:hover{background:var(--accent-soft)}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.note{
+  margin-top:16px;padding:10px 12px;
+  background:var(--panel2);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;
+  font-size:12.5px;color:var(--muted);
+}
+.note code{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink)}
+.errmsg{color:var(--err);font-size:13px;margin-top:10px;display:none}
+
+.xyz{display:grid;gap:8px;margin-bottom:6px}
+.xyzrow{
+  display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:baseline;
+  background:var(--panel2);border:1px solid var(--line);border-radius:4px;
+  padding:10px 14px;overflow-x:auto;
+}
+.xyzrow .k{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--accent-ink);font-size:15px;
+}
+.xyzrow .v{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;
+  font-size:clamp(16px,2.4vw,21px);
+  font-variant-numeric:tabular-nums;
+  text-align:right;white-space:nowrap;
+}
+.xyzrow .v .u{font-size:12px;font-weight:400;color:var(--muted);margin-left:6px}
+
+table.mid{
+  width:100%;border-collapse:collapse;margin-top:6px;
+  font-size:13px;
+}
+table.mid td{
+  padding:5px 6px;border-top:1px solid var(--line);
+  font-variant-numeric:tabular-nums;
+}
+table.mid td:first-child{color:var(--muted)}
+table.mid td:nth-child(2){font-family:"IBM Plex Mono",monospace;text-align:right;white-space:nowrap}
+table.mid td:nth-child(3){font-family:"IBM Plex Mono",monospace;color:var(--muted);text-align:right;white-space:nowrap}
+
+.placeholder{color:var(--muted);font-size:13.5px;padding:14px 0}
+
+.viz{margin-top:22px}
+.viz canvas{
+  display:block;width:100%;height:auto;
+  background:var(--canvas-bg);
+  border:1px solid var(--line);border-radius:6px;
+  cursor:grab;touch-action:none;
+}
+.viz canvas:active{cursor:grabbing}
+.vizhint{font-size:12px;color:var(--muted);margin-top:6px;display:flex;gap:16px;flex-wrap:wrap}
+.vizhint .sw{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:baseline}
+
+footer{margin-top:34px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;max-width:75ch}
+footer code{font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+
+.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;font-size:14px}
+.topnav .site{font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+.topnav a{color:var(--accent-ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+.topnav a:hover{border-bottom-color:var(--accent-ink)}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html">Avaleht</a><a href="kalkulaator.html" aria-current="page">Kalkulaator</a></nav>
+<header class="mast">
+  <h1>Kepler → ECEF</h1>
+  <span class="course">Satelliitgeodeesia · GPS orbiidi kalkulaator</span>
+</header>
+
+<p class="lede">Sisesta RINEX 3.04 navigatsioonifailist selekteeritud <b>ühe GPS satelliidi</b> Kepleri orbiidi elemendid. Kalkulaator lahendab Kepleri võrrandi ja arvutab satelliidi ristkoordinaadid <b>ECEF (WGS84)</b> süsteemis, kuna λ on antud Greenwichi meridiaani suhtes.</p>
+
+<div class="grid">
+
+<section class="panel">
+  <h2>Sisend — orbiidi elemendid</h2>
+
+  <div class="field">
+    <span class="sym">a</span>
+    <span class="fmid"><label for="in-a">Orbiidi pikem pooltelg</label>
+      <input id="in-a" inputmode="decimal" autocomplete="off" placeholder="26 560 000"></span>
+    <span class="unit">m</span>
+  </div>
+
+  <div class="field">
+    <span class="sym">e</span>
+    <span class="fmid"><label for="in-e">Ekstsentrilisus</label>
+      <input id="in-e" inputmode="decimal" autocomplete="off" placeholder="0.01"></span>
+    <span class="unit">—</span>
+  </div>
+
+  <div class="field">
+    <span class="sym">i</span>
+    <span class="fmid"><label for="in-i">Inklinatsioon</label>
+      <input id="in-i" inputmode="decimal" autocomplete="off" placeholder="0.96"></span>
+    <span class="unit">rad</span>
+  </div>
+
+  <div class="field">
+    <span class="sym">λ</span>
+    <span class="fmid"><label for="in-lam">Tõususõlme pikkus Greenwichi suhtes</label>
+      <input id="in-lam" inputmode="decimal" autocomplete="off" placeholder="1.25"></span>
+    <span class="unit">rad</span>
+  </div>
+
+  <div class="field">
+    <span class="sym">ω</span>
+    <span class="fmid"><label for="in-om">Perigee argument</label>
+      <input id="in-om" inputmode="decimal" autocomplete="off" placeholder="−1.7"></span>
+    <span class="unit">rad</span>
+  </div>
+
+  <div class="field">
+    <span class="sym">M</span>
+    <span class="fmid"><label for="in-M">Keskmine anomaalia</label>
+      <input id="in-M" inputmode="decimal" autocomplete="off" placeholder="0.41"></span>
+    <span class="unit">rad</span>
+  </div>
+
+  <div class="btnrow">
+    <button class="primary" id="btn-calc">Arvuta XYZ</button>
+    <button class="ghost" id="btn-example">Näidisandmed</button>
+    <button class="ghost" id="btn-clear">Tühjenda</button>
+  </div>
+  <p class="errmsg" id="errmsg"></p>
+
+  <div class="note">
+    NB! RINEX 3.04 failis on antud <code>sqrtA</code> — pooltelje ruutjuur (√m). Siia sisesta
+    <code>a&nbsp;=&nbsp;sqrtA²</code>. Kümnendkohaeraldajana sobib nii punkt kui koma;
+    eksponentkuju <code>2.656E7</code> on lubatud. Nurgad radiaanides, nagu RINEX-is.
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Väljund — WGS84 koordinaadid</h2>
+
+  <div id="out-empty" class="placeholder">Sisesta elemendid ja vajuta „Arvuta XYZ”. Tulemused ja joonis ilmuvad siia.</div>
+
+  <div id="out" hidden>
+    <div class="xyz">
+      <div class="xyzrow"><span class="k">X</span><span class="v" id="vX"></span></div>
+      <div class="xyzrow"><span class="k">Y</span><span class="v" id="vY"></span></div>
+      <div class="xyzrow"><span class="k">Z</span><span class="v" id="vZ"></span></div>
+    </div>
+
+    <table class="mid" aria-label="Vahetulemused">
+      <tr><td>Ekstsentriline anomaalia&nbsp;E</td><td id="vE"></td><td id="vEd"></td></tr>
+      <tr><td>Tõeline anomaalia&nbsp;ν</td><td id="vNu"></td><td id="vNud"></td></tr>
+      <tr><td>Laiuse argument&nbsp;u&nbsp;=&nbsp;ω&nbsp;+&nbsp;ν</td><td id="vU"></td><td id="vUd"></td></tr>
+      <tr><td>Geotsentriline kaugus&nbsp;r</td><td id="vR"></td><td></td></tr>
+      <tr><td>Kepleri võrrandi iteratsioone</td><td id="vIt"></td><td></td></tr>
+    </table>
+
+    <div class="viz">
+      <canvas id="cv" width="1000" height="640" aria-label="Satelliidi asukoht ECEF teljestikus"></canvas>
+      <p class="vizhint">
+        <span><span class="sw" style="background:var(--canvas-sat)"></span>satelliit ja raadiusvektor</span>
+        <span><span class="sw" style="background:var(--canvas-orbit)"></span>orbiit (hetkeseis ECEF-is)</span>
+        <span><span class="sw" style="background:var(--canvas-axis)"></span>Maa (WGS84, mõõtkavas)</span>
+        <span>Joonise pööramiseks lohista hiirega</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  Arvutuskäik: Kepleri võrrand <code>E − e·sin E = M</code> lahendatakse Newtoni iteratsiooniga;
+  <code>ν = atan2(√(1−e²)·sin E, cos E − e)</code>, <code>r = a(1 − e·cos E)</code>, <code>u = ω + ν</code>;
+  seejärel pööramised <code>R₃(−λ)·R₁(−i)·R₃(−u)</code> annavad
+  <code>X = r(cos u·cos λ − sin u·sin λ·cos i)</code>,
+  <code>Y = r(cos u·sin λ + sin u·cos λ·cos i)</code>,
+  <code>Z = r·sin u·sin i</code>.
+  Kuna λ on tõususõlme pikkus Greenwichi meridiaani suhtes, on tulemus otse Maaga kaasapöörlevas
+  ECEF (WGS84) süsteemis. Joonisel kujutatud orbiidijoon on sama elemendikomplekti pühkides
+  M = 0…2π — s.t orbiidi hetkeseis ECEF-is, Maa pöörlemist joonisel ei arvestata.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- parsing ---------- */
+function parseNum(str){
+  if(str==null) return NaN;
+  var s=String(str).trim().replace(/\s+/g,"").replace(/−/g,"-").replace(/,/g,".");
+  if(s==="") return NaN;
+  if(!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(s)) return NaN;
+  return parseFloat(s);
+}
+
+/* ---------- core computation ---------- */
+function keplerE(M,e){
+  // Newton iteration for E - e*sinE = M
+  var E = (e<0.8) ? M : Math.PI, it=0;
+  for(; it<60; it++){
+    var d = (E - e*Math.sin(E) - M)/(1 - e*Math.cos(E));
+    E -= d;
+    if(Math.abs(d) < 1e-14) { it++; break; }
+  }
+  return {E:E, it:it};
+}
+function compute(a,e,i,lam,om,M){
+  var ke = keplerE(M,e);
+  var E = ke.E;
+  var nu = Math.atan2(Math.sqrt(1-e*e)*Math.sin(E), Math.cos(E)-e);
+  var r = a*(1-e*Math.cos(E));
+  var u = om+nu;
+  var cu=Math.cos(u), su=Math.sin(u), cl=Math.cos(lam), sl=Math.sin(lam), ci=Math.cos(i), si=Math.sin(i);
+  return {
+    E:E, nu:nu, u:u, r:r, it:ke.it,
+    X:r*(cu*cl - su*sl*ci),
+    Y:r*(cu*sl + su*cl*ci),
+    Z:r*su*si
+  };
+}
+
+/* ---------- formatting ---------- */
+function fmtM(x){ // metres, thousands sep with narrow space, 3 decimals
+  var neg = x<0; x=Math.abs(x);
+  var s = x.toFixed(3);
+  var p = s.split(".");
+  p[0]=p[0].replace(/\B(?=(\d{3})+(?!\d))/g," ");
+  return (neg?"−":"")+p.join(".");
+}
+function fmtRad(x){ return x.toFixed(9)+" rad"; }
+function fmtDeg(x){ return (x*180/Math.PI).toFixed(6)+"°"; }
+
+/* ---------- DOM ---------- */
+var $=function(id){return document.getElementById(id);};
+var inputs={a:$("in-a"),e:$("in-e"),i:$("in-i"),lam:$("in-lam"),om:$("in-om"),M:$("in-M")};
+var state=null;
+
+function readInputs(){
+  var vals={}, badIds=[];
+  for(var k in inputs){
+    var v=parseNum(inputs[k].value);
+    inputs[k].classList.remove("bad");
+    if(isNaN(v)){ badIds.push(k); }
+    vals[k]=v;
+  }
+  if(badIds.length){
+    badIds.forEach(function(k){inputs[k].classList.add("bad");});
+    return {err:"Kontrolli punasega märgitud välju — väärtus puudub või pole arv."};
+  }
+  if(vals.a<=0) { inputs.a.classList.add("bad"); return {err:"Pooltelg a peab olema positiivne (meetrites, GPS puhul ≈ 2.656·10⁷ m)."}; }
+  if(vals.e<0 || vals.e>=1){ inputs.e.classList.add("bad"); return {err:"Ekstsentrilisus peab olema vahemikus 0 ≤ e < 1."}; }
+  return {vals:vals};
+}
+
+function showError(msg){
+  var el=$("errmsg");
+  if(msg){ el.textContent=msg; el.style.display="block"; }
+  else { el.style.display="none"; }
+}
+
+function calc(){
+  var rd=readInputs();
+  if(rd.err){ showError(rd.err); return; }
+  showError(null);
+  var v=rd.vals;
+  var res=compute(v.a,v.e,v.i,v.lam,v.om,v.M);
+  state={vals:v,res:res};
+  $("out-empty").hidden=true;
+  $("out").hidden=false;
+  $("vX").innerHTML=fmtM(res.X)+'<span class="u">m</span>';
+  $("vY").innerHTML=fmtM(res.Y)+'<span class="u">m</span>';
+  $("vZ").innerHTML=fmtM(res.Z)+'<span class="u">m</span>';
+  $("vE").textContent=fmtRad(res.E);  $("vEd").textContent=fmtDeg(res.E);
+  $("vNu").textContent=fmtRad(res.nu); $("vNud").textContent=fmtDeg(res.nu);
+  $("vU").textContent=fmtRad(res.u);  $("vUd").textContent=fmtDeg(res.u);
+  $("vR").textContent=fmtM(res.r)+" m";
+  $("vIt").textContent=state.res.it;
+  draw();
+}
+
+$("btn-calc").addEventListener("click",calc);
+$("btn-example").addEventListener("click",function(){
+  // Typical GPS broadcast values (a = sqrtA², angles in rad)
+  inputs.a.value="26560277.522";
+  inputs.e.value="0.0091327";
+  inputs.i.value="0.9614884";
+  inputs.lam.value="1.2523340";
+  inputs.om.value="-1.7345602";
+  inputs.M.value="0.4123456";
+  showError(null);
+  calc();
+});
+$("btn-clear").addEventListener("click",function(){
+  for(var k in inputs){ inputs[k].value=""; inputs[k].classList.remove("bad"); }
+  showError(null);
+  state=null;
+  $("out").hidden=true;
+  $("out-empty").hidden=false;
+});
+for(var k in inputs){
+  inputs[k].addEventListener("keydown",function(ev){ if(ev.key==="Enter") calc(); });
+}
+
+/* ---------- 3D drawing ---------- */
+var cv=$("cv"), ctx=cv.getContext("2d");
+var yaw=-0.55, pitch=0.42;           // view angles
+var RE=6378137;                       // WGS84 a
+
+function cssVar(name){
+  return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function project(p,scale,cx,cy){
+  // yaw around Z, then pitch around screen-x, orthographic
+  var ca=Math.cos(yaw), sa=Math.sin(yaw), cb=Math.cos(pitch), sb=Math.sin(pitch);
+  var x1=p[0]*ca+p[1]*sa, y1=-p[0]*sa+p[1]*ca, z1=p[2];
+  var y2=y1*cb - z1*sb;   // depth
+  var z2=y1*sb + z1*cb;   // up
+  return [cx+x1*scale, cy-z2*scale, y2];
+}
+
+function draw(){
+  if(!state) return;
+  var v=state.vals, res=state.res;
+
+  // handle DPR + CSS width
+  var cssW=cv.clientWidth||1000, cssH=Math.round(cssW*0.64);
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  if(cv.width!==Math.round(cssW*dpr)||cv.height!==Math.round(cssH*dpr)){
+    cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  }
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+
+  var W=cssW,H=cssH,cx=W/2,cy=H/2;
+  var maxR=Math.max(v.a*(1+v.e),RE)*1.12;
+  var scale=Math.min(W,H)/2/maxR;
+
+  var cGrid=cssVar("--canvas-grid"), cAxis=cssVar("--canvas-axis"),
+      cOrbit=cssVar("--canvas-orbit"), cSat=cssVar("--canvas-sat"),
+      cText=cssVar("--canvas-text"), cBg=cssVar("--canvas-bg");
+
+  ctx.fillStyle=cBg; ctx.fillRect(0,0,W,H);
+  ctx.lineJoin="round"; ctx.lineCap="round";
+  ctx.font='11px "IBM Plex Mono",monospace';
+
+  function line3(p1,p2,color,width,dash){
+    var a=project(p1,scale,cx,cy), b=project(p2,scale,cx,cy);
+    ctx.strokeStyle=color; ctx.lineWidth=width;
+    ctx.setLineDash(dash||[]);
+    ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  function path3(pts,color,width,close,dash){
+    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.setLineDash(dash||[]);
+    ctx.beginPath();
+    for(var j=0;j<pts.length;j++){
+      var q=project(pts[j],scale,cx,cy);
+      if(j===0) ctx.moveTo(q[0],q[1]); else ctx.lineTo(q[0],q[1]);
+    }
+    if(close) ctx.closePath();
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // Earth wireframe (parallels + meridians)
+  var lat,lon,t,pts;
+  for(var li=-60;li<=60;li+=30){
+    lat=li*Math.PI/180; pts=[];
+    for(t=0;t<=64;t++){ lon=t/64*2*Math.PI;
+      pts.push([RE*Math.cos(lat)*Math.cos(lon),RE*Math.cos(lat)*Math.sin(lon),RE*Math.sin(lat)]); }
+    path3(pts,li===0?cAxis:cGrid,li===0?1.2:0.7,true);
+  }
+  for(var mi=0;mi<180;mi+=30){
+    lon=mi*Math.PI/180; pts=[];
+    for(t=0;t<=64;t++){ lat=-Math.PI/2+t/64*Math.PI;
+      pts.push([RE*Math.cos(lat)*Math.cos(lon),RE*Math.cos(lat)*Math.sin(lon),RE*Math.sin(lat)]); }
+    path3(pts,cGrid,0.7,false);
+  }
+
+  // Axes
+  var L=maxR*0.98;
+  line3([0,0,0],[L,0,0],cAxis,1.3);
+  line3([0,0,0],[0,L,0],cAxis,1.3);
+  line3([0,0,0],[0,0,L],cAxis,1.3);
+  line3([0,0,0],[-L*0.55,0,0],cGrid,0.8,[4,4]);
+  line3([0,0,0],[0,-L*0.55,0],cGrid,0.8,[4,4]);
+  line3([0,0,0],[0,0,-L*0.55],cGrid,0.8,[4,4]);
+  ctx.fillStyle=cText;
+  var pX=project([L*1.03,0,0],scale,cx,cy); ctx.fillText("X (Greenwich)",pX[0]-18,pX[1]-6);
+  var pY=project([0,L*1.03,0],scale,cx,cy); ctx.fillText("Y",pY[0]+4,pY[1]);
+  var pZ=project([0,0,L*1.03],scale,cx,cy); ctx.fillText("Z",pZ[0]+5,pZ[1]-2);
+
+  // Orbit trace: same elements, M swept 0..2π
+  pts=[];
+  for(t=0;t<=180;t++){
+    var Mi=t/180*2*Math.PI;
+    var q=compute(v.a,v.e,v.i,v.lam,v.om,Mi);
+    pts.push([q.X,q.Y,q.Z]);
+  }
+  path3(pts,cOrbit,1.4,true);
+
+  // Radius vector + projections onto equator plane and Z
+  var S=[res.X,res.Y,res.Z];
+  line3([0,0,0],S,cSat,1.5);
+  line3(S,[res.X,res.Y,0],cGrid,0.9,[3,4]);
+  line3([res.X,res.Y,0],[0,0,0],cGrid,0.9,[3,4]);
+
+  // Satellite marker
+  var sp=project(S,scale,cx,cy);
+  ctx.fillStyle=cSat;
+  ctx.beginPath(); ctx.arc(sp[0],sp[1],5,0,2*Math.PI); ctx.fill();
+  ctx.strokeStyle=cBg; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.arc(sp[0],sp[1],5,0,2*Math.PI); ctx.stroke();
+  ctx.fillStyle=cText;
+  ctx.fillText("SAT",sp[0]+9,sp[1]+4);
+
+  // Scale caption
+  ctx.fillStyle=cText;
+  ctx.fillText("r = "+(res.r/1000).toFixed(1)+" km",12,H-14);
+}
+
+/* drag to rotate */
+var dragging=false,lx=0,ly=0;
+cv.addEventListener("pointerdown",function(ev){
+  dragging=true;lx=ev.clientX;ly=ev.clientY;cv.setPointerCapture(ev.pointerId);
+});
+cv.addEventListener("pointermove",function(ev){
+  if(!dragging)return;
+  yaw+=(ev.clientX-lx)*0.008;
+  pitch=Math.max(-1.4,Math.min(1.4,pitch+(ev.clientY-ly)*0.008));
+  lx=ev.clientX;ly=ev.clientY;
+  draw();
+});
+cv.addEventListener("pointerup",function(){dragging=false;});
+cv.addEventListener("pointercancel",function(){dragging=false;});
+
+window.addEventListener("resize",draw);
+if(window.matchMedia){
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+}
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+})();
+</script>
+</body>
+</html>
