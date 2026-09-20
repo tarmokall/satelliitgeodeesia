@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tsüklilibisemise labor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f4f6f7; --panel:#ffffff; --panel2:#eaeff1; --panel3:#dfe6e9;
+  --ink:#172029; --muted:#5a6873; --faint:#7d8b95; --line:#c5cfd5;
+  --accent:#0f7f8b; --accent-ink:#0a626c; --accent-soft:#dfeef0;
+  --ref:#2f63a8; --slip:#bd3f36;
+  --ok:#1f7a54; --ok-soft:#dff0e7;
+  --warn:#9a6a0b; --warn-soft:#f6ecd6;
+  --none:#5f6b74; --none-soft:#e6eaec;
+  --cv-bg:#ffffff; --cv-grid:#e3e9ec; --cv-axis:#8e9ba4; --cv-text:#5a6873;
+  --cv-ref:#2f63a8; --cv-slip:#bd3f36; --cv-mark:#0f7f8b;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0e1418; --panel:#151d23; --panel2:#1b252c; --panel3:#223039;
+    --ink:#dce5ea; --muted:#8d9ca6; --faint:#76858f; --line:#2a353d;
+    --accent:#3aa8b4; --accent-ink:#5ec3cd; --accent-soft:#113138;
+    --ref:#6f9fe0; --slip:#e0756c;
+    --ok:#4fbd8b; --ok-soft:#13312a;
+    --warn:#d7a53c; --warn-soft:#332a12;
+    --none:#8d9ca6; --none-soft:#222c33;
+    --cv-bg:#111a1f; --cv-grid:#23303a; --cv-axis:#7d8d98; --cv-text:#93a3ad;
+    --cv-ref:#6f9fe0; --cv-slip:#e0756c; --cv-mark:#3aa8b4;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0e1418; --panel:#151d23; --panel2:#1b252c; --panel3:#223039;
+  --ink:#dce5ea; --muted:#8d9ca6; --faint:#76858f; --line:#2a353d;
+  --accent:#3aa8b4; --accent-ink:#5ec3cd; --accent-soft:#113138;
+  --ref:#6f9fe0; --slip:#e0756c;
+  --ok:#4fbd8b; --ok-soft:#13312a;
+  --warn:#d7a53c; --warn-soft:#332a12;
+  --none:#8d9ca6; --none-soft:#222c33;
+  --cv-bg:#111a1f; --cv-grid:#23303a; --cv-axis:#7d8d98; --cv-text:#93a3ad;
+  --cv-ref:#6f9fe0; --cv-slip:#e0756c; --cv-mark:#3aa8b4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:26px 20px 60px}
+
+header.mast{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);padding-bottom:13px}
+.mast h1{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:600;
+  font-size:clamp(22px,3.3vw,31px);margin:0;letter-spacing:.01em;text-wrap:balance}
+.mast .course{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--muted);
+  letter-spacing:.08em;text-transform:uppercase}
+p.lede{color:var(--muted);max-width:74ch;margin:12px 0 24px}
+p.lede b{color:var(--ink);font-weight:600}
+
+.grid{display:grid;grid-template-columns:minmax(0,330px) minmax(0,1fr);gap:20px;align-items:start}
+.grid>div{min-width:0}
+@media (max-width:920px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
+.panel + .panel{margin-top:18px}
+h2.ph{font-size:11.5px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);
+  margin:0 0 13px;display:flex;align-items:center;gap:9px}
+h2.ph::after{content:"";flex:1;height:1px;background:var(--line)}
+h2.ph.name{text-transform:none;letter-spacing:0;font-family:"IBM Plex Mono",monospace;
+  font-size:14.5px;color:var(--ink)}
+
+dl.meta{margin:0;font-size:13px;display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+dl.meta dt{color:var(--muted)}
+dl.meta dd{margin:0;font-family:"IBM Plex Mono",monospace;text-align:right;font-variant-numeric:tabular-nums}
+
+label.fl{display:block;font-size:12.5px;color:var(--muted);margin:14px 0 5px}
+label.fl:first-of-type{margin-top:0}
+.nrow{display:flex;gap:8px;align-items:center}
+.nrow input[type=number]{width:100%;font-family:"IBM Plex Mono",monospace;font-size:14.5px;
+  font-variant-numeric:tabular-nums;color:var(--ink);background:var(--panel2);
+  border:1px solid var(--line);border-radius:4px;padding:7px 9px}
+.nrow input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.nrow .eq{font-family:"IBM Plex Mono",monospace;font-size:12px;color:var(--faint);white-space:nowrap;min-width:74px;text-align:right}
+
+.presets{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.presets button{font:inherit;font-size:12px;padding:5px 9px;border-radius:999px;cursor:pointer;
+  background:var(--panel2);color:var(--muted);border:1px solid var(--line)}
+.presets button:hover{border-color:var(--accent);color:var(--accent-ink)}
+.presets button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+ul.combos{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+ul.combos button{width:100%;text-align:left;font:inherit;cursor:pointer;
+  background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:9px 11px;color:inherit;
+  display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:baseline}
+ul.combos button:hover{border-color:var(--accent)}
+ul.combos button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+ul.combos button[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);
+  box-shadow:inset 3px 0 0 var(--accent)}
+ul.combos .cn{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px}
+ul.combos button[aria-pressed="true"] .cn{color:var(--accent-ink)}
+ul.combos .cd{grid-column:1/-1;font-size:11.5px;color:var(--muted)}
+ul.combos .tick{font-size:11px;font-weight:600;letter-spacing:.04em}
+.t-ok{color:var(--ok)} .t-warn{color:var(--warn)} .t-none{color:var(--none)}
+
+.chartwrap{position:relative}
+canvas{display:block;width:100%;height:auto;background:var(--cv-bg);
+  border:1px solid var(--line);border-radius:5px}
+.readout{position:absolute;pointer-events:none;background:var(--panel);border:1px solid var(--line);
+  border-radius:4px;padding:6px 9px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;
+  font-variant-numeric:tabular-nums;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.12);
+  white-space:nowrap;display:none;line-height:1.45}
+.readout b{font-weight:600}
+.readout .r1{color:var(--ref)} .readout .r2{color:var(--slip)}
+
+.eqbox{margin-top:14px;background:var(--panel2);border-left:3px solid var(--accent);
+  border-radius:0 4px 4px 0;padding:11px 13px}
+.eqbox .f{font-family:"IBM Plex Mono",monospace;font-size:13px;overflow-x:auto;white-space:nowrap;
+  padding-bottom:3px;display:block}
+.eqbox .n{font-size:13px;color:var(--muted);margin-top:6px}
+
+.judge{margin-top:16px;border:1px solid var(--line);border-radius:5px;padding:13px 15px;background:var(--panel2)}
+.judge .q{font-size:14px;font-weight:600;margin:0 0 9px}
+.jbtns{display:flex;gap:8px;flex-wrap:wrap}
+.jbtns button{font:inherit;font-size:13px;font-weight:500;padding:7px 14px;border-radius:4px;cursor:pointer;
+  background:var(--panel);border:1px solid var(--line);color:inherit}
+.jbtns button:hover{border-color:var(--accent)}
+.jbtns button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.jbtns button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.diag{margin-top:13px;display:none}
+.diag.on{display:block}
+.dstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:9px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:9px 11px}
+.stat .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:17px;
+  font-variant-numeric:tabular-nums;margin-top:2px}
+.verdict{margin-top:11px;padding:10px 13px;border-radius:4px;font-size:13.5px}
+.verdict.ok{background:var(--ok-soft);color:var(--ok);border:1px solid currentColor}
+.verdict.warn{background:var(--warn-soft);color:var(--warn);border:1px solid currentColor}
+.verdict.none{background:var(--none-soft);color:var(--none);border:1px solid currentColor}
+.verdict b{font-weight:600}
+.verdict .ex{display:block;margin-top:5px;color:var(--ink);font-weight:400}
+
+table.sum{width:100%;border-collapse:collapse;font-size:13px;margin-top:2px}
+table.sum th{text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);font-weight:600;padding:0 8px 7px 0;border-bottom:1px solid var(--line)}
+table.sum td{padding:7px 8px 7px 0;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+table.sum td.c{font-family:"IBM Plex Mono",monospace;font-weight:600}
+table.sum td.n{font-family:"IBM Plex Mono",monospace;text-align:right;white-space:nowrap}
+table.sum tr.cur td{background:var(--accent-soft)}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.none{background:var(--none-soft);color:var(--none)}
+.pill.q{background:var(--panel3);color:var(--muted)}
+
+.quiz ol{margin:0;padding:0;list-style:none;display:grid;gap:18px;counter-reset:q}
+.quiz li{counter-increment:q}
+.quiz .qt{font-weight:600;font-size:14.5px;margin:0 0 9px;display:flex;gap:9px;align-items:baseline}
+.quiz .qt::before{content:counter(q);font-family:"IBM Plex Mono",monospace;color:var(--accent-ink);
+  font-size:12px;background:var(--accent-soft);border-radius:4px;padding:2px 7px;flex:none}
+.opts{display:grid;gap:5px;margin-left:31px}
+.opts button{font:inherit;font-size:13.5px;text-align:left;cursor:pointer;padding:8px 12px;border-radius:4px;
+  background:var(--panel2);border:1px solid var(--line);color:inherit}
+.opts button:hover{border-color:var(--accent)}
+.opts button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opts button.picked{border-color:var(--accent);background:var(--accent-soft)}
+.opts button.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok);font-weight:600}
+.opts button.wrong{border-color:var(--slip);background:var(--panel2);color:var(--slip)}
+.opts button[disabled]{cursor:default}
+.fb{margin:8px 0 0 31px;font-size:13px;color:var(--muted);display:none}
+.fb.on{display:block}
+.score{margin-top:22px;padding:13px 16px;border-radius:5px;background:var(--panel2);
+  border:1px solid var(--line);font-size:14px;display:none}
+.score.on{display:block}
+.score b{font-family:"IBM Plex Mono",monospace;font-size:17px}
+
+.btnrow{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+button.ghost{font:inherit;font-weight:600;font-size:13.5px;border-radius:4px;padding:8px 16px;cursor:pointer;
+  background:transparent;color:var(--accent-ink);border:1px solid var(--line)}
+button.ghost:hover{background:var(--accent-soft);border-color:var(--accent)}
+button.ghost:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+footer{margin-top:36px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);
+  padding-top:14px;max-width:88ch}
+footer code{font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;font-size:14px;flex-wrap:wrap}
+.topnav .site{font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
+.topnav a{color:var(--accent-ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+.topnav a:hover{border-bottom-color:var(--accent-ink)}
+.topnav a[aria-current="page"]{color:var(--ink);font-weight:600;border-bottom:2px solid var(--accent)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html">Avaleht</a><a href="kalkulaator.html">Kepler → ECEF</a><a href="tsykli-libisemine.html" aria-current="page">Tsükli libisemine</a></nav>
+<header class="mast">
+  <h1>Tsüklilibisemise labor</h1>
+  <span class="course">Satelliitgeodeesia · GNSS faasivaatluste lineaarkombinatsioonid</span>
+</header>
+
+<p class="lede">Vii vaatlusandmetesse kunstlik <b>tsükli libisemine</b> ja uuri, millised faasi- ja koodivaatluste lineaarkombinatsioonid selle nähtavaks teevad. Andmed on jaama <b>casa</b> reaalsed GPS-vaatlused satelliidilt <b>PRN 18</b>. Sinine kõver on alati libisemiseta võrdlusseeria, punane sama seeria sisseviidud libisemisega — päris töötluses sinist kõverat ei ole ja otsus tuleb teha ainult punase järgi.</p>
+
+<div class="grid">
+
+<div>
+  <section class="panel">
+    <h2 class="ph">Lähteandmed</h2>
+    <dl class="meta">
+      <dt>Jaam</dt><dd>casa</dd>
+      <dt>Satelliit</dt><dd>PRN 18</dd>
+      <dt>Kuupäev</dt><dd>1995-10-18 (DOY 291)</dd>
+      <dt>Ajavahemik</dt><dd>3000–8100 s</dd>
+      <dt>Epohhe</dt><dd>171 × 30 s</dd>
+      <dt>Vaatlused</dt><dd>L1 L2 P1 P2</dd>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <h2 class="ph">Sisseviidav libisemine</h2>
+    <label class="fl" for="n1">Hüpe L1 faasis, N₁ (tsüklit)</label>
+    <div class="nrow">
+      <input id="n1" type="number" step="1" value="1">
+      <span class="eq" id="n1m">+0.190 m</span>
+    </div>
+    <label class="fl" for="n2">Hüpe L2 faasis, N₂ (tsüklit)</label>
+    <div class="nrow">
+      <input id="n2" type="number" step="1" value="0">
+      <span class="eq" id="n2m">+0.000 m</span>
+    </div>
+    <div class="presets">
+      <button data-p="1,0">N₁=1 (slaidide näide)</button>
+      <button data-p="2,0">N₁=2</button>
+      <button data-p="5,0">N₁=5</button>
+      <button data-p="1,1">N₁=N₂=1</button>
+      <button data-p="77,60">N₁=77, N₂=60</button>
+      <button data-p="0,0">libisemiseta</button>
+    </div>
+    <div class="eqbox" style="border-left-color:var(--slip)">
+      <span class="n" style="margin-top:0">Libisemine viiakse sisse hetkel <b>t = 5400 s</b> ja kehtib kõigil järgnevatel epohhidel. Koodivaatlusi P1 ja P2 libisemine ei mõjuta — faasi mitmesus on koodimõõtmistes puudu.</span>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="ph">Kombinatsioon</h2>
+    <ul class="combos" id="clist"></ul>
+  </section>
+</div>
+
+<div>
+  <section class="panel">
+    <h2 class="ph name" id="ctitle">Graafik</h2>
+    <div class="chartwrap">
+      <canvas id="cv" width="1120" height="620" aria-label="Valitud lineaarkombinatsiooni graafik"></canvas>
+      <div class="readout" id="ro"></div>
+    </div>
+
+    <div class="eqbox">
+      <code class="f" id="eqf"></code>
+      <span class="n" id="eqn"></span>
+    </div>
+
+    <div class="judge">
+      <p class="q">Kas tsükli libisemist on sellel graafikul näha?</p>
+      <div class="jbtns" id="jb">
+        <button data-j="ok">Jah, selgelt</button>
+        <button data-j="warn">Kahtlane</button>
+        <button data-j="none">Ei ole näha</button>
+      </div>
+      <div class="diag" id="diag">
+        <div class="dstats">
+          <div class="stat"><div class="k">Hüppe suurus</div><div class="v" id="s-jump"></div></div>
+          <div class="stat"><div class="k">Seeria müra σ</div><div class="v" id="s-sig"></div></div>
+          <div class="stat"><div class="k">Hüpe / σ</div><div class="v" id="s-rat"></div></div>
+        </div>
+        <div class="verdict" id="verd"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2 class="ph">Sinu hinnangud</h2>
+    <table class="sum">
+      <thead><tr><th>Kombinatsioon</th><th>Sinu hinnang</th><th style="text-align:right">Hüpe</th><th style="text-align:right">σ</th><th style="text-align:right">Hüpe/σ</th></tr></thead>
+      <tbody id="sumb"></tbody>
+    </table>
+    <div class="btnrow"><button class="ghost" id="reset">Alusta otsast</button></div>
+  </section>
+
+  <section class="panel quiz">
+    <h2 class="ph">Kontrollküsimused</h2>
+    <p style="margin:0 0 16px;font-size:13.5px;color:var(--muted)" id="qhint"></p>
+    <ol id="qlist"></ol>
+    <div class="score" id="score"></div>
+  </section>
+</div>
+</div>
+
+<footer>
+  Kombinatsioonid: <code>LC = (f₁²·L1 − f₂²·L2)/(f₁² − f₂²)</code> (ionosfäärivaba),
+  <code>LI = L1 − L2</code> (geomeetriavaba),
+  <code>Lw = (f₁·L1 − f₂·L2)/(f₁ − f₂)</code> (lai riba),
+  <code>Pw = (f₁·P1 + f₂·P2)/(f₁ + f₂)</code> (kitsas riba);
+  <code>PC</code> ja <code>PI = P2 − P1</code> analoogselt koodist.
+  Lainepikkused: λ₁ = 19.03 cm, λ₂ = 24.42 cm, λC = 10.70 cm, λI = λ₂ − λ₁ = 5.39 cm, λw = 86.19 cm.
+  Iga graafiku y-telg on selle kombinatsiooni oma tsüklites ja nullitud esimese epohhi väärtusele — hüppe suurust ja kuju see ei muuda.
+  Müra σ on libisemiseta võrdlusseeria hälve libiseva 7-punktilise ruutparabooli suhtes, s.t sama suurus, mida kasutab tegelik libisemisdetektor prognoosijäägina.
+  Ülesande allikas: Hernández-Pajares M., Juan M., Sanz J., Salazar D., Ramos-Bosch P., gAGE/UPC.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+var RAW = [[3000.0,-910724.042,-910723.357,23116748.702,23116749.816],[3030.0,-925487.347,-925486.65,23101985.256,23101986.191],[3060.0,-940235.876,-940235.167,23087236.728,23087237.808],[3090.0,-954967.326,-954966.604,23072505.153,23072506.205],[3120.0,-969681.546,-969680.81,23057790.844,23057791.742],[3150.0,-984379.133,-984378.385,23043093.507,23043094.131],[3180.0,-999058.453,-999057.693,23028413.784,23028415.012],[3210.0,-1013713.903,-1013713.127,23013758.04,23013759.435],[3240.0,-1028345.404,-1028344.613,22999126.852,22999127.92],[3270.0,-1042952.222,-1042951.418,22984519.9,22984520.839],[3300.0,-1057536.338,-1057535.52,22969935.774,22969936.662],[3330.0,-1072102.896,-1072102.063,22955369.191,22955370.16],[3360.0,-1086659.426,-1086658.577,22940812.721,22940813.718],[3390.0,-1101206.515,-1101205.649,22926265.5,22926266.629],[3420.0,-1115745.568,-1115744.683,22911726.414,22911727.327],[3450.0,-1130271.773,-1130270.872,22897200.218,22897201.209],[3480.0,-1144780.009,-1144779.088,22882691.922,22882693.05],[3510.0,-1159265.928,-1159264.988,22868205.833,22868206.702],[3540.0,-1173728.901,-1173727.945,22853742.776,22853743.628],[3570.0,-1188168.15,-1188167.178,22839303.762,22839304.402],[3600.0,-1202586.789,-1202585.801,22824885.085,22824885.913],[3630.0,-1216985.898,-1216984.894,22810485.761,22810486.702],[3660.0,-1231365.799,-1231364.781,22796105.646,22796106.413],[3690.0,-1245726.758,-1245725.727,22781744.604,22781745.415],[3720.0,-1260069.19,-1260068.146,22767402.381,22767403.245],[3750.0,-1274391.816,-1274390.759,22753079.721,22753080.581],[3780.0,-1288695.424,-1288694.356,22738776.122,22738776.682],[3810.0,-1302981.645,-1302980.566,22724489.768,22724490.448],[3840.0,-1317248.733,-1317247.644,22710222.692,22710223.283],[3870.0,-1331497.219,-1331496.119,22695974.103,22695974.888],[3900.0,-1345727.63,-1345726.519,22681743.785,22681744.543],[3930.0,-1359937.122,-1359936.002,22667534.394,22667534.962],[3960.0,-1374123.618,-1374122.487,22653347.741,22653348.342],[3990.0,-1388288.269,-1388287.127,22639183.015,22639183.881],[4020.0,-1402429.174,-1402428.019,22625041.945,22625042.914],[4050.0,-1416546.003,-1416544.837,22610925.052,22610925.798],[4080.0,-1430641.83,-1430640.653,22596829.235,22596829.898],[4110.0,-1444717.042,-1444715.854,22582754.049,22582754.687],[4140.0,-1458770.165,-1458768.965,22568701.003,22568701.641],[4170.0,-1472801.773,-1472800.56,22554669.296,22554669.968],[4200.0,-1486811.091,-1486809.865,22540659.846,22540660.543],[4230.0,-1500796.364,-1500795.128,22526674.57,22526675.174],[4260.0,-1514758.18,-1514756.932,22512712.645,22512713.198],[4290.0,-1528698.187,-1528696.929,22498772.56,22498773.147],[4320.0,-1542616.998,-1542615.729,22484853.771,22484854.344],[4350.0,-1556515.124,-1556513.846,22470955.531,22470956.028],[4380.0,-1570391.246,-1570389.96,22457079.28,22457079.947],[4410.0,-1584243.687,-1584242.392,22443227.015,22443227.533],[4440.0,-1598072.561,-1598071.258,22429398.277,22429398.754],[4470.0,-1611876.04,-1611874.731,22415594.513,22415595.199],[4500.0,-1625655.23,-1625653.916,22401815.402,22401815.753],[4530.0,-1639413.192,-1639411.875,22388057.443,22388058.0],[4560.0,-1653149.185,-1653147.862,22374321.229,22374322.136],[4590.0,-1666860.887,-1666859.558,22360609.601,22360610.341],[4620.0,-1680549.283,-1680547.947,22346921.532,22346921.861],[4650.0,-1694211.427,-1694210.086,22333259.206,22333259.673],[4680.0,-1707843.864,-1707842.515,22319626.739,22319627.127],[4710.0,-1721449.882,-1721448.526,22306020.848,22306021.161],[4740.0,-1735030.395,-1735029.03,22292440.255,22292440.727],[4770.0,-1748584.439,-1748583.063,22278886.111,22278886.628],[4800.0,-1762113.268,-1762111.88,22265357.423,22265357.826],[4830.0,-1775618.56,-1775617.161,22251852.046,22251852.434],[4860.0,-1789096.028,-1789094.617,22238374.39,22238374.936],[4890.0,-1802544.43,-1802543.005,22224925.818,22224926.224],[4920.0,-1815963.744,-1815962.306,22211506.614,22211506.928],[4950.0,-1829352.942,-1829351.49,22198117.194,22198117.726],[4980.0,-1842712.339,-1842710.872,22184757.876,22184758.231],[5010.0,-1856044.127,-1856042.647,22171426.063,22171426.168],[5040.0,-1869348.84,-1869347.348,22158121.35,22158121.697],[5070.0,-1882627.897,-1882626.392,22144842.289,22144842.619],[5100.0,-1895881.22,-1895879.704,22131588.874,22131589.021],[5130.0,-1909108.268,-1909106.742,22118361.659,22118362.003],[5160.0,-1922309.714,-1922308.176,22105160.427,22105160.72],[5190.0,-1935486.173,-1935484.626,22091983.801,22091983.973],[5220.0,-1948636.843,-1948635.286,22078832.973,22078833.304],[5250.0,-1961761.999,-1961760.434,22065708.024,22065708.102],[5280.0,-1974860.203,-1974858.629,22052609.861,22052609.914],[5310.0,-1987928.213,-1987926.63,22039541.518,22039541.794],[5340.0,-2000963.46,-2000961.868,22026506.323,22026506.448],[5370.0,-2013963.836,-2013962.237,22013506.17,22013506.109],[5400.0,-2026929.069,-2026927.464,22000540.607,22000541.003],[5430.0,-2039860.257,-2039858.643,21987609.394,21987609.807],[5460.0,-2052760.495,-2052758.876,21974709.242,21974709.363],[5490.0,-2065631.44,-2065629.815,21961838.177,21961838.366],[5520.0,-2078473.499,-2078471.867,21948996.196,21948996.523],[5550.0,-2091286.491,-2091284.854,21936183.291,21936183.358],[5580.0,-2104070.224,-2104068.582,21923399.582,21923399.571],[5610.0,-2116822.872,-2116821.225,21910646.682,21910646.979],[5640.0,-2129543.889,-2129542.235,21897925.664,21897925.861],[5670.0,-2142235.271,-2142233.614,21885234.618,21885234.616],[5700.0,-2154895.636,-2154893.976,21872573.916,21872574.348],[5730.0,-2167521.931,-2167520.265,21859947.489,21859947.866],[5760.0,-2180113.614,-2180111.945,21847355.928,21847355.992],[5790.0,-2192670.673,-2192669.0,21834798.849,21834799.235],[5820.0,-2205190.243,-2205188.566,21822279.168,21822279.523],[5850.0,-2217675.441,-2217673.761,21809794.14,21809794.387],[5880.0,-2230129.203,-2230127.521,21797340.422,21797340.58],[5910.0,-2242552.078,-2242550.391,21784917.539,21784917.639],[5940.0,-2254942.206,-2254940.515,21772527.365,21772527.439],[5970.0,-2267298.409,-2267296.714,21760171.007,21760171.201],[6000.0,-2279615.754,-2279614.053,21747853.784,21747853.794],[6030.0,-2291891.459,-2291889.753,21735578.049,21735578.163],[6060.0,-2304124.441,-2304122.729,21723345.095,21723345.198],[6090.0,-2316318.973,-2316317.256,21711150.443,21711150.373],[6120.0,-2328478.91,-2328477.187,21698990.565,21698990.617],[6150.0,-2340608.784,-2340607.054,21686860.638,21686860.827],[6180.0,-2352711.708,-2352709.972,21674757.656,21674757.893],[6210.0,-2364787.409,-2364785.665,21662681.922,21662682.055],[6240.0,-2376830.185,-2376828.432,21650639.173,21650639.097],[6270.0,-2388835.578,-2388833.818,21638633.644,21638633.751],[6300.0,-2400799.247,-2400797.477,21626670.017,21626670.136],[6330.0,-2412717.448,-2412715.67,21614751.946,21614751.943],[6360.0,-2424589.359,-2424587.572,21602879.984,21602879.952],[6390.0,-2436417.58,-2436415.786,21591051.488,21591051.494],[6420.0,-2448204.86,-2448203.059,21579264.355,21579264.467],[6450.0,-2459954.089,-2459952.281,21567515.08,21567515.311],[6480.0,-2471668.253,-2471666.438,21555800.728,21555800.815],[6510.0,-2483348.268,-2483346.446,21544120.945,21544120.929],[6540.0,-2494994.103,-2494992.275,21532474.901,21532474.927],[6570.0,-2506604.032,-2506602.198,21520865.044,21520865.035],[6600.0,-2518174.119,-2518172.278,21509294.944,21509295.087],[6630.0,-2529702.202,-2529700.357,21497766.913,21497766.851],[6660.0,-2541188.042,-2541186.193,21486280.88,21486280.908],[6690.0,-2552629.032,-2552627.177,21474839.782,21474839.871],[6720.0,-2564025.631,-2564023.771,21463443.405,21463443.479],[6750.0,-2575381.174,-2575379.31,21452087.838,21452087.859],[6780.0,-2586696.963,-2586695.095,21440771.925,21440772.013],[6810.0,-2597973.422,-2597971.55,21429495.476,21429495.441],[6840.0,-2609212.504,-2609210.627,21418256.498,21418256.318],[6870.0,-2620412.845,-2620410.965,21407056.221,21407055.963],[6900.0,-2631571.631,-2631569.746,21395897.221,21395897.195],[6930.0,-2642684.19,-2642682.3,21384784.721,21384784.705],[6960.0,-2653748.25,-2653746.355,21373720.571,21373720.617],[6990.0,-2664763.157,-2664761.258,21362705.709,21362705.623],[7020.0,-2675729.538,-2675727.633,21351739.36,21351739.124],[7050.0,-2686648.064,-2686646.154,21340820.773,21340820.606],[7080.0,-2697523.294,-2697521.378,21329945.403,21329945.471],[7110.0,-2708355.295,-2708353.373,21319113.391,21319113.415],[7140.0,-2719141.681,-2719139.754,21308327.295,21308326.988],[7170.0,-2729881.439,-2729879.507,21297587.325,21297587.246],[7200.0,-2740573.832,-2740571.895,21286894.875,21286894.895],[7230.0,-2751217.518,-2751215.574,21276251.165,21276251.106],[7260.0,-2761815.463,-2761813.514,21265653.399,21265653.098],[7290.0,-2772371.507,-2772369.554,21255097.305,21255097.104],[7320.0,-2782887.254,-2782885.297,21244581.441,21244581.387],[7350.0,-2793362.896,-2793360.934,21234105.744,21234105.568],[7380.0,-2803794.824,-2803792.86,21223673.806,21223673.777],[7410.0,-2814179.121,-2814177.151,21213289.496,21213289.4],[7440.0,-2824511.124,-2824509.15,21202957.541,21202957.357],[7470.0,-2834787.003,-2834785.026,21192681.623,21192681.549],[7500.0,-2845007.864,-2845005.885,21182460.708,21182460.587],[7530.0,-2855176.448,-2855174.465,21172292.117,21172291.96],[7560.0,-2865292.985,-2865290.998,21162175.622,21162175.436],[7590.0,-2875361.231,-2875359.241,21152107.351,21152107.191],[7620.0,-2885383.738,-2885381.744,21142084.932,21142084.729],[7650.0,-2895357.374,-2895355.378,21132111.206,21132110.962],[7680.0,-2905281.072,-2905279.072,21122187.51,21122187.337],[7710.0,-2915154.469,-2915152.466,21112314.07,21112313.947],[7740.0,-2924974.952,-2924972.946,21102493.594,21102493.347],[7770.0,-2934741.972,-2934739.963,21092726.563,21092726.333],[7800.0,-2944457.874,-2944455.862,21083010.691,21083010.495],[7830.0,-2954123.177,-2954121.161,21073345.342,21073345.212],[7860.0,-2963738.168,-2963736.15,21063730.573,21063730.234],[7890.0,-2973302.174,-2973300.152,21054166.461,21054166.282],[7920.0,-2982815.348,-2982813.323,21044653.043,21044652.868],[7950.0,-2992275.466,-2992273.437,21035193.006,21035192.874],[7980.0,-3001682.176,-3001680.144,21025786.372,21025786.19],[8010.0,-3011035.736,-3011033.701,21016432.76,21016432.55],[8040.0,-3020336.799,-3020334.762,21007131.52,21007131.452],[8070.0,-3029583.673,-3029581.632,20997884.734,20997884.534],[8100.0,-3038776.54,-3038774.496,20988691.893,20988691.701]];
+
+var c=299792458, f1=1575.42e6, f2=1227.60e6;
+var lam1=c/f1, lam2=c/f2, lamC=c/(f1+f2), lamW=c/(f1-f2), lamI=lam2-lam1;
+var TSLIP=5400;
+
+var T=[],A={L1:[],L2:[],P1:[],P2:[]};
+for(var i=0;i<RAW.length;i++){T.push(RAW[i][0]);A.L1.push(RAW[i][1]);A.L2.push(RAW[i][2]);A.P1.push(RAW[i][3]);A.P2.push(RAW[i][4]);}
+var N=T.length;
+
+var COMBOS=[
+ {id:"L1", name:"L1", desc:"toorfaas, midagi eemaldatud pole", lam:lam1, unit:"L1 tsüklit",
+  f:function(a,b,p,q){return a;},
+  eq:"L1 = ρ + c(dt_vastuvõtja − dt_satelliit) + Trop − Ion + λ₁N₁ + ε",
+  note:"Mõõdetud faasis domineerib geomeetriline kaugus ρ. Kahe järjestikuse epohhi vahel muutub ρ kümneid kilomeetreid ehk sadu tuhandeid L1 tsükleid — ühe tsükli hüpe kaob selle kõrval täielikult ära."},
+ {id:"L1-P1", name:"L1 − P1", desc:"geomeetria ja kellad eemaldatud", lam:lam1, unit:"L1 tsüklit",
+  f:function(a,b,p,q){return a-p;},
+  eq:"L1 − P1 = −2·Ion + (riistvaralised nihked) + λ₁N₁ + ε",
+  note:"Sama signaali faas miinus kood: ρ, kellavead ja troposfäär taanduvad, alles jääb kahekordne ionosfääri mõju (graafiku trend), mitmesus ja koodimüra. Koodi P1 müra on detsimeetrites ehk sama suurusjärk kui λ₁ = 19 cm."},
+ {id:"LC-PC", name:"LC − PC", desc:"ionosfäärivaba faas miinus kood", lam:lamC, unit:"Lc tsüklit",
+  f:function(a,b,p,q){return (f1*f1*a-f2*f2*b)/(f1*f1-f2*f2) - (f1*f1*p-f2*f2*q)/(f1*f1-f2*f2);},
+  eq:"LC − PC = (riistvaralised nihked) + λC·Rc + ε",
+  note:"Ionosfäärivaba kombinatsioon eemaldab lisaks ka ionosfääri — järele jääb konstant pluss müra. Kahe koodivaatluse kombineerimine aga võimendab koodimüra ligi kolm korda."},
+ {id:"LI-PI", name:"LI − PI", desc:"geomeetriavaba faas miinus kood", lam:lamI, unit:"LI tsüklit",
+  f:function(a,b,p,q){return (a-b)-(q-p);},
+  eq:"LI − PI = (riistvaralised nihked) + (λ₁N₁ − λ₂N₂) + ε",
+  note:"Ka ionosfäär taandub, sest see sisaldub nii faasi- kui koodikombinatsioonis sama suurusega. Aga koodimüra jääb sisse ja λI = 5.4 cm on väga lühike ühik — müra on mitu ühikut."},
+ {id:"LI", name:"LI = L1 − L2", desc:"geomeetriavaba, ainult faas", lam:lamI, unit:"LI tsüklit",
+  f:function(a,b,p,q){return a-b;},
+  eq:"LI = L1 − L2 = Ion + (riistvaralised nihked) + (λ₁N₁ − λ₂N₂) + ε",
+  note:"Ainult faasivaatlused, koodi üldse ei kasutata — müra on millimeetrites. Alles jääb ionosfääri mõju, mis muutub sujuvalt ja 30 sekundiga vähem kui ühe tsükli jagu. Seetõttu paistab iga järsk hüpe kohe välja."},
+ {id:"MW", name:"Lw − Pw", desc:"Melbourne–Wübbena", lam:lamW, unit:"Lw tsüklit",
+  f:function(a,b,p,q){return (f1*a-f2*b)/(f1-f2) - (f1*p+f2*q)/(f1+f2);},
+  eq:"W = Lw − Pw = (riistvaralised nihked) + λw·(N₁ − N₂) + ε",
+  note:"Geomeetria, kellad, troposfäär ja ionosfäär on kõik eemaldatud. Otsustav on ühik: λw = 86 cm on nii pikk, et koodimüra jääb alla ühe tsükli. Hüpe on täpselt N₁ − N₂ laia riba tsüklit."}
+];
+
+var state={combo:"L1", n1:1, n2:0, judg:{}, quiz:{}};
+
+/* ---------- arvutus ---------- */
+function slipped(){
+  var d1=state.n1*lam1, d2=state.n2*lam2;
+  var o={L1:[],L2:[],P1:A.P1,P2:A.P2};
+  for(var i=0;i<N;i++){
+    var on = T[i]>=TSLIP ? 1 : 0;
+    o.L1.push(A.L1[i]+on*d1);
+    o.L2.push(A.L2[i]+on*d2);
+  }
+  return o;
+}
+function series(cb,arr){
+  var out=[],i;
+  for(i=0;i<N;i++) out.push(cb.f(arr.L1[i],arr.L2[i],arr.P1[i],arr.P2[i])/cb.lam);
+  return out;
+}
+/* Savitzky–Golay jääk: 7 punkti, 2. astme parabool, keskpunkt */
+var SG=[-2,3,6,7,6,3,-2], SGN=21;
+function sigmaOf(y){
+  var res=[],i,k,s;
+  for(i=3;i<y.length-3;i++){
+    s=0; for(k=-3;k<=3;k++) s+=SG[k+3]*y[i+k];
+    res.push(y[i]-s/SGN);
+  }
+  if(!res.length) return 0;
+  var m=0; for(i=0;i<res.length;i++) m+=res[i]; m/=res.length;
+  var v=0; for(i=0;i<res.length;i++) v+=(res[i]-m)*(res[i]-m);
+  return Math.sqrt(v/(res.length-1));
+}
+function jumpOf(cb){ return cb.f(state.n1*lam1, state.n2*lam2, 0, 0)/cb.lam; }
+
+function analysis(cb){
+  var ref=series(cb,A), sig=sigmaOf(ref), j=jumpOf(cb);
+  var r = sig>0 ? Math.abs(j)/sig : 0;
+  var cls = r>=5 ? "ok" : (r>=1.2 ? "warn" : "none");
+  return {ref:ref, sigma:sig, jump:j, ratio:r, cls:cls};
+}
+
+/* ---------- vormindus ---------- */
+function fx(v,n){ var s=v.toFixed(n); return s==="-0"||/^-0\.0*$/.test(s) ? s.slice(1) : s; }
+function sci(v){
+  if(v===0) return "0";
+  var a=Math.abs(v);
+  if(a>=1e5||a<1e-3){ var e=Math.floor(Math.log10(a)); return (v/Math.pow(10,e)).toFixed(2)+"e"+e; }
+  if(a>=1e3) return v.toFixed(0);
+  if(a>=10) return v.toFixed(1);
+  return v.toFixed(2);
+}
+
+/* ---------- joonistamine ---------- */
+var cv=document.getElementById("cv"), ctx=cv.getContext("2d"), ro=document.getElementById("ro");
+var PLOT=null, hoverI=-1;
+function cssv(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function niceNum(x,round){
+  var e=Math.floor(Math.log10(x)), f=x/Math.pow(10,e), nf;
+  if(round) nf = f<1.5?1 : f<3?2 : f<7?5 : 10;
+  else      nf = f<=1?1 : f<=2?2 : f<=5?5 : 10;
+  return nf*Math.pow(10,e);
+}
+function ticks(lo,hi,n){
+  if(hi-lo<=0){ return [lo]; }
+  var span=niceNum(hi-lo,false), step=niceNum(span/(n-1),true);
+  var t0=Math.floor(lo/step)*step, t1=Math.ceil(hi/step)*step, out=[],v;
+  for(v=t0; v<=t1+step*0.5; v+=step) if(v>=lo-step*1e-6 && v<=hi+step*1e-6) out.push(v);
+  return out;
+}
+function draw(){
+  var cb=combo(), an=analysis(cb), sl=series(cb,slipped()), ref=an.ref;
+  var base=ref[0], i;
+  var r2=[],s2=[];
+  for(i=0;i<N;i++){ r2.push(ref[i]-base); s2.push(sl[i]-base); }
+
+  var cssW=cv.clientWidth||1120, cssH=Math.max(300,Math.round(cssW*0.55));
+  var dpr=Math.min(window.devicePixelRatio||1,2);
+  if(cv.width!==Math.round(cssW*dpr)||cv.height!==Math.round(cssH*dpr)){
+    cv.width=Math.round(cssW*dpr); cv.height=Math.round(cssH*dpr);
+  }
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  var W=cssW,H=cssH;
+  var mL=78,mR=16,mT=14,mB=46;
+  var pw=W-mL-mR, ph=H-mT-mB;
+
+  var lo=Infinity,hi=-Infinity;
+  for(i=0;i<N;i++){ lo=Math.min(lo,r2[i],s2[i]); hi=Math.max(hi,r2[i],s2[i]); }
+  if(hi-lo<1e-9){ hi=lo+1; lo=lo-1; }
+  var pad=(hi-lo)*0.09; lo-=pad; hi+=pad;
+  var x0=T[0], x1=T[N-1];
+
+  function X(t){ return mL+(t-x0)/(x1-x0)*pw; }
+  function Y(v){ return mT+(hi-v)/(hi-lo)*ph; }
+  PLOT={X:X,Y:Y,mL:mL,mT:mT,pw:pw,ph:ph,r2:r2,s2:s2,x0:x0,x1:x1,cb:cb};
+
+  var cBg=cssv("--cv-bg"), cGrid=cssv("--cv-grid"), cAx=cssv("--cv-axis"), cTx=cssv("--cv-text"),
+      cRef=cssv("--cv-ref"), cSlip=cssv("--cv-slip"), cMark=cssv("--cv-mark");
+
+  ctx.fillStyle=cBg; ctx.fillRect(0,0,W,H);
+  ctx.font='11.5px "IBM Plex Mono",monospace'; ctx.lineJoin="round"; ctx.lineCap="round";
+
+  var yt=ticks(lo,hi,7), xt=ticks(x0,x1,9);
+  ctx.strokeStyle=cGrid; ctx.lineWidth=1;
+  ctx.beginPath();
+  for(i=0;i<yt.length;i++){ var yy=Math.round(Y(yt[i]))+0.5; ctx.moveTo(mL,yy); ctx.lineTo(mL+pw,yy); }
+  for(i=0;i<xt.length;i++){ var xx=Math.round(X(xt[i]))+0.5; ctx.moveTo(xx,mT); ctx.lineTo(xx,mT+ph); }
+  ctx.stroke();
+
+  ctx.strokeStyle=cAx; ctx.lineWidth=1.1;
+  ctx.beginPath();
+  ctx.moveTo(mL+0.5,mT); ctx.lineTo(mL+0.5,mT+ph+0.5); ctx.lineTo(mL+pw,mT+ph+0.5); ctx.stroke();
+
+  ctx.fillStyle=cTx; ctx.strokeStyle=cAx; ctx.lineWidth=1;
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  ctx.beginPath();
+  for(i=0;i<yt.length;i++){
+    var ty=Math.round(Y(yt[i]))+0.5;
+    ctx.moveTo(mL-4,ty); ctx.lineTo(mL,ty);
+    ctx.fillText(sci(yt[i]), mL-9, Y(yt[i]));
+  }
+  for(i=0;i<xt.length;i++){ var tx=Math.round(X(xt[i]))+0.5; ctx.moveTo(tx,mT+ph); ctx.lineTo(tx,mT+ph+4); }
+  ctx.stroke();
+  ctx.textBaseline="top";
+  for(i=0;i<xt.length;i++){
+    var px2=X(xt[i]);
+    ctx.textAlign = (px2-mL<14) ? "left" : (mL+pw-px2<14 ? "right" : "center");
+    ctx.fillText(String(Math.round(xt[i])), px2, mT+ph+9);
+  }
+  ctx.font='12px "IBM Plex Sans",sans-serif'; ctx.textAlign="center";
+  ctx.fillText("GPS aeg (s)", mL+pw/2, mT+ph+27);
+  ctx.save(); ctx.translate(16,mT+ph/2); ctx.rotate(-Math.PI/2);
+  ctx.textAlign="center"; ctx.textBaseline="middle";
+  ctx.fillText(cb.unit, 0, 0); ctx.restore();
+
+  /* libisemise hetk */
+  var xs=X(TSLIP);
+  ctx.strokeStyle=cMark; ctx.lineWidth=1.2; ctx.setLineDash([5,4]);
+  ctx.beginPath(); ctx.moveTo(xs,mT); ctx.lineTo(xs,mT+ph); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle=cMark; ctx.font='11px "IBM Plex Mono",monospace';
+  ctx.textAlign="left"; ctx.textBaseline="top"; ctx.fillText(" t = 5400 s", xs, mT+3);
+
+  /* seeriad */
+  function diamond(x,y,s){ ctx.beginPath(); ctx.moveTo(x,y-s); ctx.lineTo(x+s,y); ctx.lineTo(x,y+s); ctx.lineTo(x-s,y); ctx.closePath(); ctx.stroke(); }
+  function plus(x,y,s){ ctx.beginPath(); ctx.moveTo(x-s,y); ctx.lineTo(x+s,y); ctx.moveTo(x,y-s); ctx.lineTo(x,y+s); ctx.stroke(); }
+  ctx.strokeStyle=cRef; ctx.lineWidth=1.1;
+  for(i=0;i<N;i++) diamond(X(T[i]),Y(r2[i]),2.7);
+  ctx.strokeStyle=cSlip; ctx.lineWidth=1.3;
+  for(i=0;i<N;i++) plus(X(T[i]),Y(s2[i]),3.1);
+
+  /* legend — pane kõige hõredamasse nurka */
+  var lw=248, lh=38;
+  var cand=[[mL+pw-lw-10, mT+26],[mL+10, mT+26],[mL+pw-lw-10, mT+ph-lh-10],[mL+10, mT+ph-lh-10]];
+  var best=0, bestN=Infinity;
+  for(var ci=0;ci<cand.length;ci++){
+    var cnt=0, bx=cand[ci][0], by=cand[ci][1];
+    for(i=0;i<N;i++){
+      var qx=X(T[i]);
+      if(qx<bx-6||qx>bx+lw+6) continue;
+      if((Y(r2[i])>by-6&&Y(r2[i])<by+lh+6)||(Y(s2[i])>by-6&&Y(s2[i])<by+lh+6)) cnt++;
+    }
+    if(cnt<bestN){ bestN=cnt; best=ci; }
+  }
+  var lx=cand[best][0], ly=cand[best][1];
+  ctx.fillStyle=cBg; ctx.globalAlpha=0.88; ctx.fillRect(lx,ly,lw,lh); ctx.globalAlpha=1;
+  ctx.strokeStyle=cGrid; ctx.lineWidth=1; ctx.strokeRect(lx+0.5,ly+0.5,lw,lh);
+  ctx.font='11.5px "IBM Plex Mono",monospace'; ctx.textAlign="left"; ctx.textBaseline="middle";
+  ctx.strokeStyle=cRef; ctx.lineWidth=1.1; diamond(lx+13,ly+12,2.7);
+  ctx.fillStyle=cTx; ctx.fillText("libisemiseta (võrdlus)", lx+24, ly+12);
+  ctx.strokeStyle=cSlip; ctx.lineWidth=1.3; plus(lx+13,ly+26,3.1);
+  ctx.fillStyle=cTx; ctx.fillText("libisemisega", lx+24, ly+26);
+
+  /* hover */
+  if(hoverI>=0 && hoverI<N){
+    var hx=X(T[hoverI]);
+    ctx.strokeStyle=cAx; ctx.lineWidth=0.8; ctx.setLineDash([2,3]);
+    ctx.beginPath(); ctx.moveTo(hx,mT); ctx.lineTo(hx,mT+ph); ctx.stroke(); ctx.setLineDash([]);
+    ctx.strokeStyle=cRef; ctx.lineWidth=1.6; diamond(hx,Y(r2[hoverI]),4.2);
+    ctx.strokeStyle=cSlip; ctx.lineWidth=1.8; plus(hx,Y(s2[hoverI]),4.6);
+  }
+}
+function combo(){ for(var i=0;i<COMBOS.length;i++) if(COMBOS[i].id===state.combo) return COMBOS[i]; return COMBOS[0]; }
+
+/* ---------- hover ---------- */
+cv.addEventListener("pointermove",function(ev){
+  if(!PLOT) return;
+  var r=cv.getBoundingClientRect(), px=ev.clientX-r.left, py=ev.clientY-r.top;
+  if(px<PLOT.mL||px>PLOT.mL+PLOT.pw||py<PLOT.mT||py>PLOT.mT+PLOT.ph){ hide(); return; }
+  var frac=(px-PLOT.mL)/PLOT.pw, idx=Math.round(frac*(N-1));
+  idx=Math.max(0,Math.min(N-1,idx));
+  if(idx!==hoverI){ hoverI=idx; draw(); }
+  var d=PLOT.s2[idx]-PLOT.r2[idx];
+  ro.innerHTML='<b>t = '+T[idx]+' s</b><br>'+
+    '<span class="r1">võrdlus&nbsp; '+fx(PLOT.r2[idx],3)+'</span><br>'+
+    '<span class="r2">libisem. '+fx(PLOT.s2[idx],3)+'</span><br>'+
+    'vahe&nbsp;&nbsp;&nbsp;&nbsp; '+fx(d,3)+' '+PLOT.cb.unit.split(" ")[0];
+  ro.style.display="block";
+  var rw=ro.offsetWidth, rh=ro.offsetHeight;
+  var lx=px+14; if(lx+rw>cv.clientWidth-4) lx=px-rw-14;
+  var ly=py-rh-10; if(ly<2) ly=py+16;
+  ro.style.left=lx+"px"; ro.style.top=ly+"px";
+});
+function hide(){ ro.style.display="none"; if(hoverI!==-1){ hoverI=-1; draw(); } }
+cv.addEventListener("pointerleave",hide);
+
+/* ---------- UI ---------- */
+var clist=document.getElementById("clist");
+function renderCombos(){
+  clist.innerHTML="";
+  COMBOS.forEach(function(cb){
+    var li=document.createElement("li");
+    var b=document.createElement("button");
+    b.setAttribute("aria-pressed", String(cb.id===state.combo));
+    var j=state.judg[cb.id];
+    var tick = j ? '<span class="tick t-'+j+'">'+(j==="ok"?"✓ näen":j==="warn"?"~ kahtlane":"✗ ei näe")+'</span>' : '<span class="tick" style="color:var(--faint)">—</span>';
+    b.innerHTML='<span class="cn">'+cb.name+'</span>'+tick+'<span class="cd">'+cb.desc+'</span>';
+    b.addEventListener("click",function(){ state.combo=cb.id; hoverI=-1; renderAll(); });
+    li.appendChild(b); clist.appendChild(li);
+  });
+}
+function renderChartArea(){
+  var cb=combo(), an=analysis(cb);
+  document.getElementById("ctitle").firstChild.nodeValue=cb.name;
+  document.getElementById("eqf").textContent=cb.eq;
+  document.getElementById("eqn").textContent=cb.note;
+  var jb=document.getElementById("jb");
+  [].forEach.call(jb.children,function(b){ b.setAttribute("aria-pressed", String(state.judg[cb.id]===b.dataset.j)); });
+  var diag=document.getElementById("diag");
+  if(state.judg[cb.id]){
+    diag.classList.add("on");
+    document.getElementById("s-jump").textContent=fx(an.jump,2)+" ";
+    document.getElementById("s-sig").textContent=fx(an.sigma,3);
+    document.getElementById("s-rat").textContent=an.sigma>0?fx(an.ratio,1):"—";
+    var v=document.getElementById("verd");
+    v.className="verdict "+an.cls;
+    var head = an.cls==="ok" ? "Libisemine on selgelt tuvastatav."
+             : an.cls==="warn" ? "Libisemine on müra piiril — üksi ei saa selle põhjal otsustada."
+             : "Libisemine ei ole tuvastatav.";
+    var why;
+    if(Math.abs(an.jump)<1e-9) why="Selle kombinatsiooni hüpe on täpselt null: valitud N₁ ja N₂ kombinatsioon taandub välja. Kombinatsioon on selle libisemise suhtes pime.";
+    else if(an.cls==="ok") why="Hüpe on "+fx(an.ratio,0)+" korda suurem kui seeria enda hajuvus, seega eristub see üheselt ka ilma võrdlusseeriata.";
+    else if(an.cls==="warn") why="Hüpe on vaid "+fx(an.ratio,1)+" korda üle müra. Ilma sinise võrdluskõverata ei suudaks sa öelda, millisel epohhil libisemine toimus.";
+    else why="Seeria oma varieeruvus ületab hüppe "+fx(1/Math.max(an.ratio,1e-9),0)+" korda.";
+    v.innerHTML="<b>"+head+"</b><span class='ex'>"+why+"</span>";
+  } else diag.classList.remove("on");
+}
+function renderSummary(){
+  var tb=document.getElementById("sumb"); tb.innerHTML="";
+  COMBOS.forEach(function(cb){
+    var an=analysis(cb), tr=document.createElement("tr");
+    if(cb.id===state.combo) tr.className="cur";
+    var j=state.judg[cb.id];
+    var pill = j ? '<span class="pill '+j+'">'+(j==="ok"?"näen selgelt":j==="warn"?"kahtlane":"ei ole näha")+'</span>'
+                 : '<span class="pill q">vaatamata</span>';
+    tr.innerHTML='<td class="c">'+cb.name+'</td><td>'+pill+'</td>'+
+      '<td class="n">'+(j?fx(an.jump,2):"–")+'</td>'+
+      '<td class="n">'+(j?fx(an.sigma,3):"–")+'</td>'+
+      '<td class="n">'+(j?(an.sigma>0?fx(an.ratio,1):"–"):"–")+'</td>';
+    tb.appendChild(tr);
+  });
+  var done=0; COMBOS.forEach(function(cb){ if(state.judg[cb.id]) done++; });
+  document.getElementById("qhint").textContent = done<COMBOS.length
+    ? "Oled hinnanud "+done+" kombinatsiooni kuuest. Vaata enne vastamist kõik läbi — küsimused eeldavad, et oled iga graafikut näinud."
+    : "Kõik kuus kombinatsiooni on läbi vaadatud. Vasta nüüd küsimustele.";
+}
+function renderAll(){ renderCombos(); renderChartArea(); renderSummary(); draw(); }
+
+document.getElementById("jb").addEventListener("click",function(ev){
+  var b=ev.target.closest("button"); if(!b) return;
+  state.judg[combo().id]=b.dataset.j; renderAll();
+});
+function setN(){
+  var a=parseInt(document.getElementById("n1").value,10); if(isNaN(a)) a=0;
+  var b=parseInt(document.getElementById("n2").value,10); if(isNaN(b)) b=0;
+  a=Math.max(-500,Math.min(500,a)); b=Math.max(-500,Math.min(500,b));
+  state.n1=a; state.n2=b;
+  document.getElementById("n1m").textContent=(a>=0?"+":"")+ (a*lam1).toFixed(3)+" m";
+  document.getElementById("n2m").textContent=(b>=0?"+":"")+ (b*lam2).toFixed(3)+" m";
+  renderAll();
+}
+document.getElementById("n1").addEventListener("input",setN);
+document.getElementById("n2").addEventListener("input",setN);
+[].forEach.call(document.querySelectorAll(".presets button"),function(b){
+  b.addEventListener("click",function(){
+    var p=b.dataset.p.split(",");
+    document.getElementById("n1").value=p[0];
+    document.getElementById("n2").value=p[1];
+    setN();
+  });
+});
+document.getElementById("reset").addEventListener("click",function(){
+  state.judg={}; state.quiz={};
+  document.getElementById("score").classList.remove("on");
+  renderQuiz(); setN();
+});
+
+/* ---------- quiz ---------- */
+var QUIZ=[
+ {q:"Vii sisse ühe tsükli libisemine L1-s (N₁ = 1, N₂ = 0). Millises kombinatsioonis on hüppe ja müra suhe kõige suurem ehk libisemine kõige kergemini tuvastatav?",
+  o:["L1 (toorfaas)","L1 − P1","LC − PC","LI = L1 − L2","LI − PI"], a:3,
+  fb:"LI hüpe on 3.5 LI-tsüklit, aga seeria müra on ainult 0.01 tsüklit — suhe üle 300. Põhjus: LI kasutab ainult faasivaatlusi (müra millimeetrites) ja geomeetria taandub täielikult välja. Melbourne–Wübbena kombinatsioon tuvastab libisemise samuti selgelt (suhe ≈ 13), kuid madalama varuga, sest see sisaldab koodivaatlusi."},
+ {q:"Miks ei ole ühe tsükli libisemine toorel L1 faasil nähtav, kuigi see on seal füüsiliselt olemas?",
+  o:["Faasivaatluse müra on suurem kui üks tsükkel","Geomeetriline kaugus ρ muutub kahe epohhi vahel kümneid tuhandeid tsükleid ja varjutab hüppe","Ionosfäär kompenseerib hüppe ära","Vastuvõtja parandab libisemise automaatselt ära"], a:1,
+  fb:"L1 faasi muutus kahe 30-sekundilise epohhi vahel on umbes 65 000 tsüklit. Ühe tsükli hüpe on sellest ligi 1/65 000 — graafikul eristamatu. Sama kehtib ka L2 kohta."},
+ {q:"Miks ei aita libisemist usaldusväärselt tuvastada kombinatsioonid L1 − P1, LC − PC ja LI − PI, kuigi neis on geomeetria eemaldatud?",
+  o:["Need sisaldavad koodivaatlusi, mille müra on sama suur või suurem kui üks faasitsükkel","Need eemaldavad ka libisemise enda","Neid saab arvutada ainult kahesageduslikus vastuvõtjas","Ionosfääri trend on neis liiga suur"], a:0,
+  fb:"Koodimõõtmise müra on detsimeetrites kuni meetrites, faasimõõtmise müra aga millimeetrites. Niipea kui kombinatsiooni võetakse kood, tõuseb müratase üle ühe faasitsükli (19 cm) ja väike libisemine upub sellesse."},
+ {q:"Vali N₁ = 1 ja N₂ = 1 ning vaata Melbourne–Wübbena graafikut. Kui suur on hüpe?",
+  o:["1 laia riba tsükkel","2 laia riba tsüklit","Täpselt null — hüpet ei ole","0.5 tsüklit"], a:2,
+  fb:"Melbourne–Wübbena kombinatsiooni mitmesus on N₁ − N₂, seega N₁ = N₂ korral hüpe taandub täielikult välja ja kombinatsioon on selle libisemise suhtes pime. LI aga näitab sel juhul hüpet selgelt, sest LI mitmesus on λ₁N₁ − λ₂N₂ ≠ 0."},
+ {q:"Vali N₁ = 77 ja N₂ = 60 ning võrdle LI ja Lw − Pw graafikuid. Mida sa näed?",
+  o:["Mõlemad näitavad hüpet","LI näitab hüpet, MW mitte","MW näitab hüpet, LI ei näita üldse","Kumbki ei näita hüpet"], a:2,
+  fb:"GPS sagedused on f₁ = 154·10.23 MHz ja f₂ = 120·10.23 MHz, seega f₁/f₂ = 154/120 = 77/60. Sellest järeldub λ₁·77 = λ₂·60 täpselt (14.6526 m), nii et LI hüpe λ₁N₁ − λ₂N₂ on täpselt null — geomeetriavaba kombinatsioon on selle libisemise suhtes pime. MW näitab samal ajal hüpet 77 − 60 = 17 laia riba tsüklit. Just seepärast kasutatakse praktikas mõlemat kombinatsiooni koos: nende pimenurgad ei kattu."},
+ {q:"Milline on nende kahe kombinatsiooni tööjaotus reaalses GNSS-töötluses?",
+  o:["LI tuvastab libisemise, MW parandab selle ära","Mõlemad on samaväärsed, piisab ühest","Kaks sõltumatut kombinatsiooni võimaldavad määrata mõlemad tundmatud, N₁ ja N₂","MW-d kasutatakse ainult ühesageduslike vastuvõtjatega"], a:2,
+  fb:"Libisemine on kaks tundmatut — hüpe L1-s ja hüpe L2-s. Ühest kombinatsioonist saab ühe võrrandi, seega kahe tundmatu määramiseks on vaja kahte sõltumatut kombinatsiooni. LI ja MW ongi see paar, mida kasutatakse enamikus töötlusprogrammides."}
+];
+function renderQuiz(){
+  var ol=document.getElementById("qlist"); ol.innerHTML="";
+  QUIZ.forEach(function(q,qi){
+    var li=document.createElement("li");
+    var h=document.createElement("p"); h.className="qt"; h.appendChild(document.createTextNode(q.q));
+    li.appendChild(h);
+    var d=document.createElement("div"); d.className="opts";
+    q.o.forEach(function(txt,oi){
+      var b=document.createElement("button"); b.type="button"; b.textContent=txt;
+      var ans=state.quiz[qi];
+      if(ans!==undefined){
+        b.disabled=true;
+        if(oi===q.a) b.className="right";
+        else if(oi===ans) b.className="wrong";
+      }
+      b.addEventListener("click",function(){
+        if(state.quiz[qi]!==undefined) return;
+        state.quiz[qi]=oi; renderQuiz(); showScore();
+      });
+      d.appendChild(b);
+    });
+    li.appendChild(d);
+    var fb=document.createElement("p"); fb.className="fb"+(state.quiz[qi]!==undefined?" on":"");
+    fb.textContent=q.fb; li.appendChild(fb);
+    ol.appendChild(li);
+  });
+}
+function showScore(){
+  var n=0,ok=0;
+  QUIZ.forEach(function(q,qi){ if(state.quiz[qi]!==undefined){ n++; if(state.quiz[qi]===q.a) ok++; } });
+  var el=document.getElementById("score");
+  if(n<QUIZ.length){ el.classList.remove("on"); return; }
+  el.classList.add("on");
+  var msg = ok===QUIZ.length ? "Kõik õiged — oled kombinatsioonide tööpõhimõttest aru saanud."
+          : ok>=QUIZ.length-2 ? "Hea tulemus. Vaata üle need küsimused, kus eksisid, ja kontrolli vastavat graafikut uuesti."
+          : "Tasub graafikud uuesti läbi vaadata ja iga kombinatsiooni selgitust lugeda.";
+  el.innerHTML="Tulemus: <b>"+ok+" / "+QUIZ.length+"</b> &nbsp;— "+msg;
+}
+
+window.addEventListener("resize",draw);
+if(window.matchMedia) window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",draw);
+new MutationObserver(draw).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+
+renderQuiz(); setN();
+})();
+</script>
+</body>
+</html>

@@ -105,7 +105,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
 </head>
 <body>
 <div class="wrap">
-<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html" aria-current="page">Avaleht</a><a href="kalkulaator.html">Kalkulaator</a></nav>
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html" aria-current="page">Avaleht</a><a href="kalkulaator.html">Kepler → ECEF</a><a href="tsykli-libisemine.html">Tsükli libisemine</a></nav>
 
 <header class="mast">
   <h1>Satelliitgeodeesia</h1>
@@ -115,17 +115,21 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
 <main>
 <h2>Õppeainest</h2>
 <p>Õppeaine käsitleb satelliitidel põhinevaid geodeetilisi mõõtmis- ja positsioneerimismeetodeid: GNSS süsteemide (GPS, GLONASS, Galileo, BeiDou) ülesehitust, satelliitide orbiidimehaanikat, signaale ja vaatlussuurusi, koordinaat- ja ajasüsteeme ning GNSS vaatluste töötlemist geodeetilise täpsuse saavutamiseks.</p>
-<div class="edit">MI.2043 Satelliitgeodeesia (5 EAP)<br>Maakorralduse ja geodeesia õppetool<br>Eesti Maaülikool</div>
+<div class="edit">Toimeta see tutvustus oma ainekava järgi — lisa ainekood, maht (EAP), semester ja hindamise põhimõtted.</div>
 
 <h2>Tööriistad</h2>
 <a class="toolcard" href="kalkulaator.html">
   <span class="t">Kepler → ECEF kalkulaator</span>
-  <p class="d">Arvutab GPS satelliidi WGS84 ristkoordinaadid XYZ Kepleri orbiidi elementidest (a, e, i, λ, ω, M), mis on selekteeritud RINEX navigatsioonifailist. Kuvab ka vahetulemused ja pööratava 3D joonise satelliidi asukohast.</p>
+  <p class="d">Arvuta GPS satelliidi WGS84 ristkoordinaadid XYZ Kepleri orbiidi elementidest (a, e, i, λ, ω, M), mis on selekteeritud RINEX 3.04 navigatsioonifailist. Kuvab ka vahetulemused ja pööratava 3D joonise satelliidi asukohast.</p>
+</a>
+<a class="toolcard" href="tsykli-libisemine.html">
+  <span class="t">Tsüklilibisemise labor</span>
+  <p class="d">Vii reaalsetesse GPS faasivaatlustesse kunstlik tsükli libisemine ja uuri, millised lineaarkombinatsioonid (L1, L1−P1, LC−PC, LI−PI, LI, Melbourne–Wübbena) selle nähtavaks teevad. Sisaldab hüppe ja müra arvulist võrdlust ning kontrollküsimusi.</p>
 </a>
 
 <h2>Materjalid</h2>
 <p>Loengukonspektid, praktikumide juhendid ja andmefailid lisatakse siia jooksvalt semestri vältel.</p>
-<div class="edit">Täiendamisel</div>
+<div class="edit">Lisa siia lingid oma materjalidele — PDF-failid võid panna samasse GitHubi repositooriumisse (nt kausta <code>materjalid/</code>) ja linkida kujul <code>&lt;a href="materjalid/loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
 
 <h2>Kontakt</h2>
 <p>Õppejõud: Tarmo Kall — küsimused loengus, praktikumis või e-posti teel.</p>
@@ -139,7 +143,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
     'E-post: <a href="mailto:' + a + '">' + a + "</a>";
 })();
 </script>
-<div class="edit">Geodeesia kaasprofessor</div>
+<div class="edit">Täienda soovi korral ametinime ja vastuvõtuaegadega.</div>
 </main>
 
 <footer>Satelliitgeodeesia · õppeotstarbeline leht</footer>
