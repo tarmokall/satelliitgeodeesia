@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GNSS sessioonide planeerija (Rail Baltica KP1)</title>
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--bd:#dde1e7;--tx:#1c2530;--mut:#5b6675;--acc:#1d6fb8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.55 system-ui,Segoe UI,Roboto,sans-serif}
+.wrap{max-width:1060px;margin:0 auto;padding:24px 18px 60px}
+.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:22px;font-size:14px;flex-wrap:wrap}
+.topnav .site{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--mut);margin-right:auto}
+.topnav a{color:var(--acc);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
+.topnav a:hover{border-bottom-color:var(--acc)}
+.topnav a[aria-current="page"]{color:var(--tx);font-weight:600;border-bottom:2px solid var(--acc)}
+h1{font-size:24px;font-weight:600;margin:0 0 4px}
+h2{font-size:16px;font-weight:600;margin:0 0 10px}
+.sub{color:var(--mut);margin:0 0 20px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:18px;margin-bottom:18px}
+label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+textarea{width:100%;min-height:190px;font:13px/1.5 ui-monospace,Consolas,monospace;border:1px solid var(--bd);border-radius:8px;padding:10px;resize:vertical}
+#figs{min-height:130px}
+input[type=number]{width:90px;font-size:15px;border:1px solid var(--bd);border-radius:8px;padding:7px 10px}
+.row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+button{font:600 14px system-ui;border:none;border-radius:8px;padding:10px 18px;cursor:pointer}
+.pri{background:var(--acc);color:#fff}
+.sec{background:#e8ecf1;color:var(--tx)}
+button:hover{filter:brightness(1.07)}
+#err{display:none;background:#fdecec;border:1px solid #f0b9b9;color:#8f2020;border-radius:8px;padding:10px 14px;margin-bottom:18px}
+#info{display:none;background:#e6f6ec;border:1px solid #9fd8b4;color:#0a5c32;border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:13.5px}
+#warn{display:none;background:#fdf6e3;border:1px solid #e8d48a;color:#7a5c00;border-radius:8px;padding:10px 14px;margin-bottom:18px;font-size:13.5px}
+#out{display:none}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:22px;font-weight:600}
+.stat span{font-size:12.5px;color:var(--mut)}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;margin:0 0 12px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.sw{width:20px;height:4px;border-radius:2px;display:inline-block}
+svg{width:100%;height:auto;display:block;background:#fff;border:1px solid var(--bd);border-radius:10px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--bd);vertical-align:top}
+th{font-size:12.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.note{font-size:13px;color:var(--mut)}
+.right{margin-left:auto}
+.ok{color:#0a7d43;font-weight:600}
+.bad{color:#b02222;font-weight:600}
+.rep{color:#b02222}
+.tie{color:#1d6fb8}
+.nw{white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html">Avaleht</a><a href="kalkulaator.html">Kepler → ECEF</a><a href="tsykli-libisemine.html">Tsükli libisemine</a><a href="gnss-sessiooniplaneerija.html" aria-current="page">GNSS sessioonid</a></nav>
+
+<h1>GNSS staatiliste sessioonide planeerija</h1>
+<p class="sub">Planeerija arvestab Rail Baltica &bdquo;Geodeesia eritingimuste&ldquo; (v3, 07.11.2024) KP1 v&otilde;rgu n&otilde;udeid: igas m&otilde;&otilde;tmissessioonis v&auml;hemalt 3 mittetriviaalset vektorit (p 2.7.9) ja v&auml;hemalt kaks vektorit otse KP0 punktide v&otilde;i CORS&#8209;jaamade pealt (p 2.7.10); m&auml;&auml;ratavad punktid on omavahel seotud mittetriviaalsete vektoritega (p 2.7.11); sessiooni minimaalne pikkus 90 min kuni 15 km vektorite puhul, iga lisa 5 km kohta +40 min (p 2.7.12); vektori maksimaalne pikkus 25 km (p 2.7.13); igal m&auml;&auml;rataval punktil v&auml;hemalt kaks m&otilde;&otilde;tesessiooni (p 2.7.15); v&otilde;rk moodustab mittetriviaalsetest vektoritest kolmnurkadest koosneva lausv&otilde;rgu (p 2.7.17); tasandus sisaldab ainult mittetriviaalseid vektoreid (p 2.7.18). Sisesta punktid L&#8209;Est97 koordinaatidega (X = p&otilde;hi, Y = ida) koos t&uuml;&uuml;biga ning defineeri v&otilde;rgu kolmnurgad v&otilde;i lase need automaatselt genereerida.</p>
+
+<div class="card">
+  <div class="row">
+    <div>
+      <label for="recv">V&auml;livastuv&otilde;tjate arv</label>
+      <input type="number" id="recv" min="2" max="30" value="6">
+    </div>
+    <div class="note">Igas sessioonis h&otilde;ivatakse kuni nii mitu punkti korraga (m&auml;&auml;ratavad + riiklikud l&auml;htepunktid + baasjaamad).<br>CORS&#8209;p&uuml;sijaamad vastuv&otilde;tjaid ei kasuta &mdash; nad m&otilde;&otilde;davad pidevalt ja osalevad igas sessioonis.</div>
+    <div><label style="font-weight:500"><input type="checkbox" id="allcors" checked> Seo iga sessioon k&otilde;igi CORS&#8209;jaamadega (&le; 25 km) &mdash; tasuta lisakontroll (p 2.7.14)</label></div>
+  </div>
+  <div class="grid2">
+    <div>
+      <label for="data">Punktid &mdash; iga rida: ID; X; Y; [t&uuml;&uuml;p]</label>
+      <textarea id="data" spellcheck="false"></textarea>
+      <p class="note" style="margin:6px 0 0">Eraldajaks semikoolon v&otilde;i tabulaator (ID v&otilde;ib sisaldada t&uuml;hikuid); ilma t&uuml;hikuteta ID korral sobib ka t&uuml;hik. T&uuml;&uuml;p: <b>LP</b> = l&auml;htepunkt (KP0 / riiklik punkt, h&otilde;ivatakse vastuv&otilde;tjaga vajadusel), <b>BAAS</b> = l&auml;htepunkt, mis on h&otilde;ivatud k&otilde;igis sessioonides (baasjaam, kulutab p&uuml;sivalt &uuml;he vastuv&otilde;tja), <b>CORS</b> = GNSS p&uuml;sijaam, t&uuml;hi v&otilde;i <b>MP</b> = m&auml;&auml;ratav (tundmatu) punkt.</p>
+    </div>
+    <div>
+      <label for="figs">V&otilde;rgu kujundid &mdash; iga rida &uuml;ks kujund: punktide ID&#8209;d j&auml;rjekorras</label>
+      <textarea id="figs" spellcheck="false"></textarea>
+      <p class="note" style="margin:6px 0 0">Eraldajaks semikoolon (v&otilde;i t&uuml;hik, kui ID&#8209;des t&uuml;hikuid pole). 3+ punkti = suletud kujund, 2 punkti = &uuml;ksik vektor. Kindelpunktide vahelisi vektoreid ei kasutata &mdash; need j&auml;etakse hoiatusega v&auml;lja. Automaatne genereerimine v&otilde;tab kasutusele k&otilde;ik sisestatud kindelpunktid (&le; 25 km kaugusel). Kui m&otilde;ni vektor ei ole kolmnurga k&uuml;lg, lisab planeerija puuduva k&uuml;lje ise.</p>
+    </div>
+  </div>
+  <div class="row" style="margin:12px 0 0">
+    <button class="pri" onclick="run()">Arvuta sessioonid</button>
+    <button class="sec" onclick="fillSample()">N&auml;idisandmed</button>
+    <button class="sec" onclick="autoFigures()">Genereeri tingimustele vastav v&otilde;rk automaatselt</button>
+    <button class="sec" onclick="document.getElementById('data').value='';document.getElementById('figs').value=''">T&uuml;hjenda</button>
+    <button class="sec right" id="dl" style="display:none" onclick="downloadSvg()">Laadi joonis alla (SVG)</button>
+  </div>
+</div>
+
+<div id="err"></div>
+<div id="info"></div>
+<div id="warn"></div>
+
+<div id="out">
+  <div class="stats" id="stats"></div>
+  <div class="card" style="overflow-x:auto">
+    <h2>N&otilde;uete kontroll (Geodeesia eritingimused p 7)</h2>
+    <table id="tblReq"></table>
+  </div>
+  <div class="card">
+    <div class="legend" id="legend"></div>
+    <div class="legend" id="legend2"></div>
+    <div id="plot"></div>
+    <p class="note" style="margin:10px 0 0">Joonisel: v&auml;rvilised jooned = sessiooni s&otilde;ltumatud vektorid (katkendjoon = kordusvektor teises sessioonis, peen joon = planeerija lisatud side kindelpunktiga), hallid pinnad = l&otilde;pliku v&otilde;rgu kolmnurgad (p 2.7.17). P&otilde;hi on &uuml;leval.</p>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <h2>Sessioonid</h2>
+    <table id="tbl"></table>
+    <p class="note" style="margin:10px 0 0">Min kestus (p 2.7.12): kuni 15 km vektorid &rarr; 90 min; iga lisanduva 5 km kohta +40 min (pikima vektori j&auml;rgi). Vektori lubatud max pikkus 25 km (p 2.7.13).</p>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <h2>Punktide h&otilde;ivatus ja sidemed kindelpunktidega</h2>
+    <table id="tblPts"></table>
+  </div>
+  <div class="card" style="overflow-x:auto">
+    <h2>Defineeritud kujundite sulgemine (mittetriviaalsuse kontroll)</h2>
+    <table id="tblFigs"></table>
+  </div>
+  <p class="note">Meetod: v&otilde;rgu struktuuri kujundavad m&auml;&auml;ratavate punktide vahelised vektorid, mis jaotatakse sessioonideks nii, et &uuml;he sessiooni vektorid ei moodusta kunagi suletud kujundit &mdash; k&otilde;ik sessiooni vektorid on s&otilde;ltumatud (mittetriviaalsed, p 2.7.18) ja iga kolmnurk sulgub v&auml;hemalt kahe eri sessiooni vektoritest. Sidemed kindelpunktidega lisatakse igasse sessiooni m&auml;&auml;ratavatest punktidest: CORS&#8209;vektor on tasuta (p&uuml;sijaam m&otilde;&otilde;dab pidevalt), riikliku l&auml;htepunkti side vajab vastuv&otilde;tjat. Kindelpunktide vahel vektoreid ei moodustata. Kui m&auml;&auml;ratav punkt j&auml;&auml;ks vaid &uuml;hte sessiooni, t&otilde;stab planeerija m&otilde;ne tema vektori teise sessiooni v&otilde;i lisab kordusvektori (p 2.7.15). Kui sessioonis puudub side kahe kindelpunktiga (p 2.7.10) v&otilde;i on alla 3 vektori (p 2.7.9), lisab planeerija sidemed; kui m&otilde;ni vektor ei ole kolmnurga k&uuml;lg (p 2.7.17), lisab planeerija puuduva k&uuml;lje m&auml;&auml;ratav&ndash;m&auml;&auml;ratav&ndash;kindelpunkt kolmnurga kujul.</p>
+</div>
+</div>
+<script>
+"use strict";
+
+const MAXLEN = 25000; // p 2.7.13: vektori max pikkus (m)
+
+function ptype(t){
+  if (t === undefined || t === null || t === "") return "unknown";
+  const u = String(t).toUpperCase();
+  if (u === "LP" || u === "L" || u === "FIX" || u === "FIXED" || u === "TEADA" || u === "KP0" || u.indexOf("LÄHTE") === 0 || u.indexOf("LAHTE") === 0 || u.indexOf("KINDEL") === 0) return "known";
+  if (u === "CORS" || u === "PJ" || u.indexOf("PÜSI") === 0 || u.indexOf("PYSI") === 0 || u.indexOf("PUSI") === 0) return "cors";
+  if (u === "BAAS" || u === "BASE" || u === "BAASJAAM" || u === "LPB") return "base";
+  if (u === "MP" || u === "UP" || u === "TP" || u === "M" || u === "U" || u === "T" || u === "UUS" || u === "KP1" ||
+      u.indexOf("TUNDMA") === 0 || u.indexOf("MÄÄRA") === 0 || u.indexOf("MAARA") === 0) return "unknown";
+  throw 'Tundmatu punkti tüüp: "' + t + '" (kasuta LP, BAAS, CORS või MP)';
+}
+
+const TYPENAME = { known: "Lähtepunkt", base: "Lähtepunkt (baasjaam, hõivatud kõigis sessioonides)", cors: "Püsijaam (CORS)", unknown: "Määratav" };
+
+function parsePoints(txt) {
+  const pts = [];
+  const seen = new Set();
+  const lines = txt.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const s = lines[i].trim();
+    if (!s || s.startsWith("#")) continue;
+    let f = s.split(/[;\t]+/).map(x => x.trim()).filter(x => x !== "");
+    if (f.length >= 3) {
+      f = [f[0], f[1].replace(",", "."), f[2].replace(",", ".")].concat(f.slice(3));
+    } else {
+      f = s.split(/[,\s]+/).filter(x => x !== "");
+    }
+    if (f.length < 3) throw "Rida " + (i + 1) + ': oodatud kuju "ID; X; Y; [tüüp]"';
+    const id = f[0], X = parseFloat(f[1]), Y = parseFloat(f[2]);
+    if (!isFinite(X) || !isFinite(Y)) throw "Rida " + (i + 1) + ": koordinaadid pole arvud";
+    if (seen.has(id)) throw "Korduv punkti ID: " + id;
+    let ty;
+    try { ty = ptype(f[3]); } catch (e) { throw "Rida " + (i + 1) + ": " + e; }
+    seen.add(id);
+    pts.push({ id: id, n: X, e: Y, type: ty });
+  }
+  return pts;
+}
+
+function parseFigures(txt, idIndex) {
+  const figs = [];
+  const lines = txt.split(/\r?\n/);
+  for (let i = 0; i < lines.length; i++) {
+    const s = lines[i].trim();
+    if (!s || s.startsWith("#")) continue;
+    let ids = s.indexOf(";") >= 0 || s.indexOf("\t") >= 0
+      ? s.split(/[;\t]+/).map(x => x.trim()).filter(x => x !== "")
+      : s.split(/[\s,]+/).filter(x => x !== "");
+    if (ids.length < 2) throw "Kujund real " + (i + 1) + ": vaja vähemalt 2 punkti (vektor) või 3 punkti (suletud kujund)";
+    const seen = new Set(), idx = [];
+    for (const id of ids) {
+      if (!(id in idIndex)) throw "Kujund real " + (i + 1) + ': tundmatu punkt "' + id + '"';
+      if (seen.has(id)) throw "Kujund real " + (i + 1) + ": punkt " + id + " kordub";
+      seen.add(id);
+      idx.push(idIndex[id]);
+    }
+    figs.push({ idx: idx, label: ids.join(" – "), closed: ids.length >= 3 });
+  }
+  if (!figs.length) throw "Defineeri vähemalt üks kujund või vektor (või genereeri võrk automaatselt)";
+  return figs;
+}
+
+function natCompare(a, b) {
+  const ax = String(a).match(/(\d+|\D+)/g) || [];
+  const bx = String(b).match(/(\d+|\D+)/g) || [];
+  for (let i = 0; i < Math.max(ax.length, bx.length); i++) {
+    if (ax[i] === undefined) return -1;
+    if (bx[i] === undefined) return 1;
+    const an = /^\d+$/.test(ax[i]), bn = /^\d+$/.test(bx[i]);
+    if (an && bn) {
+      const d = parseInt(ax[i], 10) - parseInt(bx[i], 10);
+      if (d) return d;
+    } else {
+      const d = ax[i].localeCompare(bx[i]);
+      if (d) return d;
+    }
+  }
+  return 0;
+}
+
+// p 2.7.12: kuni 15 km -> 90 min; iga lisa 5 km kohta +40 min
+function sessionDuration(maxLenM) {
+  const km = maxLenM / 1000;
+  if (km <= 15) return 90;
+  return 90 + 40 * Math.ceil((km - 15) / 5 - 1e-9);
+}
+
+function planSessions(pts, figures, R, opts) {
+  opts = opts || {};
+  const allCors = opts.allCors !== false;
+  const N = pts.length;
+  if (N < 3) throw "Vaja on vähemalt 3 punkti";
+  if (R < 2) throw "Vaja on vähemalt 2 välivastuvõtjat";
+  // CORS mõõdab pidevalt (tasuta); BAAS-lähtepunkt on hõivatud kõigis sessioonides (kulutab püsivalt 1 vastuvõtja)
+  const nBase = pts.filter(p => p.type === "base").length;
+  if (nBase >= R) throw "Baasjaamad (" + nBase + ") kasutavad kõik vastuvõtjad ära — suurenda vastuvõtjate arvu";
+  const isC = i => pts[i].type === "cors" || pts[i].type === "base";
+  const isCors = i => pts[i].type === "cors";
+  const isRef = i => pts[i].type !== "unknown";
+  const isUnk = i => pts[i].type === "unknown";
+  const dist = (a, b) => Math.hypot(pts[a].e - pts[b].e, pts[a].n - pts[b].n);
+
+  const order = pts.map((p, i) => i).sort((a, b) => natCompare(pts[a].id, pts[b].id));
+  const rank = new Array(N);
+  order.forEach((idx, r) => { rank[idx] = r; });
+
+  const ekey = (a, b) => (a < b ? a + "_" + b : b + "_" + a);
+  const E = new Map();
+  const getEdge = (a, b, tie) => {
+    const k = ekey(a, b);
+    if (!E.has(k)) {
+      E.set(k, {
+        a: Math.min(a, b), b: Math.max(a, b), k: k,
+        r1: Math.min(rank[a], rank[b]), r2: Math.max(rank[a], rank[b]),
+        len: dist(a, b), figs: [], tie: !!tie
+      });
+    }
+    return E.get(k);
+  };
+
+  // Vektorid kujundite külgedest; kindelpunktide vahelised vektorid jäetakse välja (RB nõue)
+  const droppedRefRef = [];
+  figures.forEach((fig, fi) => {
+    const v = fig.idx;
+    const m = fig.closed ? v.length : v.length - 1;
+    for (let i = 0; i < m; i++) {
+      const a = v[i], b = v[(i + 1) % v.length];
+      if (isRef(a) && isRef(b)) { droppedRefRef.push(pts[a].id + " – " + pts[b].id); fig.dropped = true; continue; }
+      const ed = getEdge(a, b, false);
+      if (ed.figs.indexOf(fi) < 0) ed.figs.push(fi);
+    }
+  });
+
+  const before = (p, q) => (p.r2 !== q.r2 ? p.r2 - q.r2 : p.r1 - q.r1);
+  const seedBefore = (p, q) => (p.r1 !== q.r1 ? p.r1 - q.r1 : p.r2 - q.r2);
+
+  // Struktuurivektorid = määratav–määratav; sidemed = määratav–kindelpunkt
+  const fieldKeys = [], tieKeys = [];
+  E.forEach(ed => { (isUnk(ed.a) && isUnk(ed.b)) ? fieldKeys.push(ed.k) : tieKeys.push(ed.k); });
+
+  // 1. Esmane jaotus: iga sessiooni vektorid moodustavad metsa (ei ühtegi suletud kujundit).
+  //    Kui võrgus on riiklikke lähtepunkte, reserveeritakse üks vastuvõtja lähtepunkti sidemele.
+  const hasKnown = pts.some(p => p.type === "known");
+  const Rs = (hasKnown && R - nBase >= 4) ? R - 1 : R;
+  const un = new Set(fieldKeys);
+  let sessions = [];
+  while (un.size) {
+    let seed = null;
+    un.forEach(k => { const ed = E.get(k); if (!seed || seedBefore(ed, E.get(seed)) < 0) seed = k; });
+    const verts = new Set(), edges = [], par = new Map();
+    let recv = nBase;
+    const find = x => { while (par.get(x) !== x) x = par.get(x); return x; };
+    const addV = v => { if (!verts.has(v)) { verts.add(v); par.set(v, v); if (!isC(v)) recv++; } };
+    const add = k => {
+      const ed = E.get(k);
+      addV(ed.a); addV(ed.b);
+      par.set(find(ed.a), find(ed.b));
+      edges.push({ k: ed.k, a: ed.a, b: ed.b, rep: false, tie: false });
+      un.delete(k);
+    };
+    add(seed);
+    for (;;) {
+      let best = null, bestType = -1;
+      un.forEach(k => {
+        const ed = E.get(k);
+        const ia = verts.has(ed.a), ib = verts.has(ed.b);
+        let ty = -1;
+        if (ia && ib) { if (find(ed.a) !== find(ed.b)) ty = 2; }
+        else if (ia || ib) { const nv = ia ? ed.b : ed.a; if (recv + (isC(nv) ? 0 : 1) <= Rs) ty = 1; }
+        if (ty < 0) return;
+        if (ty > bestType || (ty === bestType && before(ed, E.get(best)) < 0)) { bestType = ty; best = k; }
+      });
+      if (best) { add(best); continue; }
+      let bk = null;
+      un.forEach(k => {
+        const ed = E.get(k);
+        if (verts.has(ed.a) || verts.has(ed.b)) return;
+        if (recv + (isC(ed.a) ? 0 : 1) + (isC(ed.b) ? 0 : 1) > Rs) return;
+        if (!bk || seedBefore(ed, E.get(bk)) < 0) bk = k;
+      });
+      if (bk) { add(bk); continue; }
+      break;
+    }
+    sessions.push({ verts: verts, edges: edges });
+  }
+
+  // Abifunktsioonid
+  const sessionsOf = p => { const r = []; sessions.forEach((s, i) => { if (s.verts.has(p)) r.push(i); }); return r; };
+  const fieldPts = s => [...s.verts].filter(v => !isC(v));
+  const unkPts = s => [...s.verts].filter(isUnk);
+  const recvOf = s => fieldPts(s).length + nBase;
+  const refCount = s => [...s.verts].filter(isRef).length;
+  const canPlace = (ed, s) => {
+    if (s.edges.some(e => e.k === ed.k)) return false;
+    let recv = recvOf(s);
+    if (!s.verts.has(ed.a) && !isC(ed.a)) recv++;
+    if (!s.verts.has(ed.b) && !isC(ed.b)) recv++;
+    if (recv > R) return false;
+    const par = new Map();
+    const find = x => { while (par.get(x) !== x) x = par.get(x); return x; };
+    const mk = v => { if (!par.has(v)) par.set(v, v); };
+    for (const e of s.edges) { mk(e.a); mk(e.b); par.set(find(e.a), find(e.b)); }
+    mk(ed.a); mk(ed.b);
+    return find(ed.a) !== find(ed.b);
+  };
+  const isPlaced = ed => sessions.some(s => s.edges.some(e => e.k === ed.k));
+  const pruneE = () => { [...E.values()].forEach(ed => { if (!isPlaced(ed)) E.delete(ed.k); }); };
+  const place = (ed, s, rep, tie) => {
+    const already = isPlaced(ed);
+    s.verts.add(ed.a); s.verts.add(ed.b);
+    s.edges.push({ k: ed.k, a: ed.a, b: ed.b, rep: !!rep || already, tie: !!tie && !already });
+  };
+  const newSession = (ed, rep, tie) => {
+    sessions.push({ verts: new Set([ed.a, ed.b]), edges: [{ k: ed.k, a: ed.a, b: ed.b, rep: !!rep, tie: !!tie }] });
+  };
+
+  // 2. Kasutaja defineeritud sidemed kindelpunktidega: sessiooni, kus määratav punkt on hõivatud
+  //    (CORS tasuta, riiklik lähtepunkt vajab vastuvõtjat)
+  tieKeys.sort((x, y) => {
+    const ex = E.get(x), ey = E.get(y);
+    const cx = isC(ex.a) || isC(ex.b), cy = isC(ey.a) || isC(ey.b);
+    if (cx !== cy) return cx ? -1 : 1;
+    return seedBefore(ex, ey);
+  });
+  tieKeys.forEach(k => {
+    const ed = E.get(k);
+    const u = isUnk(ed.a) ? ed.a : ed.b;
+    let placed = false;
+    for (let ti = 0; ti < sessions.length && !placed; ti++) {
+      const t = sessions[ti];
+      if (t.verts.has(u) && canPlace(ed, t)) { place(ed, t, false, false); placed = true; }
+    }
+    for (let ti = 0; ti < sessions.length && !placed; ti++) {
+      if (canPlace(ed, sessions[ti])) { place(ed, sessions[ti], false, false); placed = true; }
+    }
+    if (!placed) newSession(ed, false, false);
+  });
+
+  // 3. Sessiooni nõuded: p 2.7.10 side >= 2 kindelpunktiga, p 2.7.9 >= 3 mittetriviaalset vektorit.
+  //    Sidemed alati määratavast punktist kindelpunkti; kindelpunktide vahel vektoreid ei tehta.
+  const corsIdx = pts.map((p, i) => i).filter(isC);
+  const tryAddCorsTie = (s, requireNew) => {
+    const ups = unkPts(s);
+    if (!ups.length) return false;
+    const cands = [];
+    corsIdx.forEach(c => {
+      if (requireNew && s.verts.has(c)) return;
+      ups.forEach(p => { const d = dist(c, p); if (d <= MAXLEN) cands.push({ c: c, p: p, d: d }); });
+    });
+    cands.sort((x, y) => x.d - y.d);
+    for (const cd of cands) {
+      const ed = getEdge(cd.c, cd.p, true);
+      if (canPlace(ed, s)) { place(ed, s, false, true); return true; }
+    }
+    return false;
+  };
+  const tryAddStation = (s, onlyKnown) => {
+    if (recvOf(s) >= R) return false;
+    const ups = unkPts(s);
+    if (!ups.length) return false;
+    const cands = [];
+    pts.forEach((p, q) => {
+      if (isC(q) || s.verts.has(q)) return;
+      if (onlyKnown && p.type !== "known") return;
+      ups.forEach(pp => { const d = dist(q, pp); if (d <= MAXLEN) cands.push({ q: q, p: pp, d: d }); });
+    });
+    cands.sort((x, y) => x.d - y.d);
+    for (const cd of cands) {
+      const ed = getEdge(cd.q, cd.p, true);
+      if (canPlace(ed, s)) { place(ed, s, false, true); return true; }
+    }
+    return false;
+  };
+  const addAllCorsTies = s => {
+    const ups = unkPts(s);
+    if (!ups.length) return;
+    corsIdx.forEach(c => {
+      if (s.verts.has(c)) return;
+      const cands = ups.map(p => ({ p: p, d: dist(c, p) })).filter(x => x.d <= MAXLEN).sort((x, y) => x.d - y.d);
+      for (const cd of cands) {
+        const ed = getEdge(c, cd.p, true);
+        if (canPlace(ed, s)) { place(ed, s, false, true); return; }
+      }
+    });
+  };
+  const fillSessions = () => {
+    sessions.forEach(s => {
+      let g = 0;
+      while (refCount(s) < 2 && g++ < 10) {
+        if (tryAddCorsTie(s, true)) continue;
+        if (tryAddStation(s, true)) continue;
+        break;
+      }
+      if (allCors) addAllCorsTies(s);
+      g = 0;
+      while (s.edges.length < 3 && g++ < 10) {
+        if (tryAddCorsTie(s, false)) continue;
+        if (tryAddStation(s, false)) continue;
+        break;
+      }
+    });
+    pruneE();
+  };
+
+  // 4. Iga määratav punkt otse seotud >= 2 eri kindelpunktiga (RB praktika)
+  const refsOf = p => { const r = new Set(); E.forEach(ed => { if (ed.a === p && isRef(ed.b)) r.add(ed.b); if (ed.b === p && isRef(ed.a)) r.add(ed.a); }); return r; };
+  const ensureRefTies = () => {
+    pts.forEach((p, i) => {
+      if (!isUnk(i) || !sessionsOf(i).length) return;
+      let g = 0;
+      while (refsOf(i).size < 2 && g++ < 5) {
+        const have = refsOf(i);
+        const cands = pts.map((q, j) => j).filter(j => isRef(j) && !have.has(j) && dist(i, j) <= MAXLEN)
+          .sort((x, y) => (isC(x) !== isC(y)) ? (isC(x) ? -1 : 1) : dist(i, x) - dist(i, y));
+        let done = false;
+        for (const r of cands) {
+          const ed = getEdge(r, i, true);
+          for (const si of sessionsOf(i)) {
+            if (canPlace(ed, sessions[si])) { place(ed, sessions[si], false, true); done = true; break; }
+          }
+          if (done) break;
+          if (!isPlaced(ed)) E.delete(ed.k);
+        }
+        if (!done) break;
+      }
+    });
+  };
+
+  // 5. p 2.7.17: iga vektor peab olema kolmnurga külg (määratav–määratav–kindelpunkt või määratav–määratav–määratav).
+  //    Puuduva külje lisab planeerija; kindelpunktide vahelist külge ei looda kunagi.
+  const adjOf = () => {
+    const A = new Map();
+    pts.forEach((p, i) => A.set(i, new Set()));
+    E.forEach(ed => { A.get(ed.a).add(ed.b); A.get(ed.b).add(ed.a); });
+    return A;
+  };
+  const inTriangle = (ed, A) => {
+    for (const c of A.get(ed.a)) if (c !== ed.b && A.get(ed.b).has(c)) return true;
+    return false;
+  };
+  const tryPlaceAnywhere = ed => {
+    let best = null;
+    sessions.forEach((s, si) => {
+      if (!canPlace(ed, s)) return;
+      const cost = ((s.verts.has(ed.a) || isC(ed.a)) ? 0 : 1) + ((s.verts.has(ed.b) || isC(ed.b)) ? 0 : 1);
+      if (best === null || cost < best.cost) best = { si: si, cost: cost };
+    });
+    if (best === null) {
+      const need = (isC(ed.a) ? 0 : 1) + (isC(ed.b) ? 0 : 1);
+      if (need > R) return false;
+      newSession(ed, false, true);
+      return true;
+    }
+    place(ed, sessions[best.si], false, true);
+    return true;
+  };
+  const triangulate = () => {
+    let changed = true, iter = 0;
+    while (changed && iter++ < 500) {
+      changed = false;
+      const A = adjOf();
+      for (const ed of [...E.values()]) {
+        if (inTriangle(ed, A)) continue;
+        const cands = [];
+        A.get(ed.a).forEach(c => { if (c !== ed.b && !A.get(ed.b).has(c) && !(isRef(ed.b) && isRef(c))) cands.push([ed.b, c]); });
+        A.get(ed.b).forEach(c => { if (c !== ed.a && !A.get(ed.a).has(c) && !(isRef(ed.a) && isRef(c))) cands.push([ed.a, c]); });
+        // Kui sobivat naabrit pole (nt üksik määratav), proovi lähimat kolmandat punkti
+        if (!cands.length) {
+          const u = isUnk(ed.a) ? ed.a : (isUnk(ed.b) ? ed.b : -1);
+          if (u >= 0) {
+            const other = u === ed.a ? ed.b : ed.a;
+            pts.forEach((p, c) => {
+              if (c === ed.a || c === ed.b) return;
+              if (isRef(other) && isRef(c)) return;
+              if (dist(c, ed.a) > MAXLEN || dist(c, ed.b) > MAXLEN) return;
+              cands.push([ed.a, c, ed.b]);
+            });
+          }
+        }
+        cands.forEach(x => { x.d = dist(x[0], x[1]) + (x.length > 2 ? dist(x[1], x[2]) : 0); x.free = isC(x[0]) || isC(x[1]); });
+        cands.sort((x, y) => (x.free !== y.free ? (x.free ? -1 : 1) : x.d - y.d));
+        for (const x of cands) {
+          if (dist(x[0], x[1]) > MAXLEN) continue;
+          const ne = getEdge(x[0], x[1], true);
+          let ok = tryPlaceAnywhere(ne);
+          if (ok && x.length > 2) {
+            const ne2 = getEdge(x[1], x[2], true);
+            ok = tryPlaceAnywhere(ne2);
+            if (!ok && !isPlaced(ne2)) E.delete(ne2.k);
+          }
+          if (ok) { changed = true; break; }
+          if (!isPlaced(ne)) E.delete(ne.k);
+        }
+        if (changed) break;
+      }
+    }
+    pruneE();
+  };
+
+  fillSessions();
+  ensureRefTies();
+  triangulate();
+  fillSessions();
+  triangulate();
+
+  // 6. p 2.7.15: igas määratavas punktis >= 2 sessiooni
+  const incident = new Map();
+  const rebuildIncident = () => {
+    incident.clear();
+    E.forEach(ed => [ed.a, ed.b].forEach(v => {
+      if (!incident.has(v)) incident.set(v, []);
+      incident.get(v).push(ed);
+    }));
+  };
+  rebuildIncident();
+  const tryMove = (p, s0i) => {
+    const s0 = sessions[s0i];
+    const pEdges = s0.edges.filter(e => e.a === p || e.b === p);
+    if (pEdges.length < 2 || s0.edges.length <= 3) return false;
+    const sorted = pEdges.slice().sort((x, y) => E.get(x.k).len - E.get(y.k).len);
+    for (const se of sorted) {
+      const ed = E.get(se.k);
+      const q = ed.a === p ? ed.b : ed.a;
+      for (let ti = 0; ti < sessions.length; ti++) {
+        if (ti === s0i) continue;
+        const t = sessions[ti];
+        if (!canPlace(ed, t)) continue;
+        const qStays = s0.edges.some(e => e !== se && (e.a === q || e.b === q));
+        if (!qStays && isRef(q) && refCount(s0) <= 2) continue;
+        if (!qStays && isUnk(q)) {
+          const qOcc = sessionsOf(q);
+          const after = new Set(qOcc.filter(x => x !== s0i));
+          after.add(ti);
+          if (after.size < 2 && after.size < qOcc.length) continue;
+        }
+        s0.edges.splice(s0.edges.indexOf(se), 1);
+        if (!qStays) s0.verts.delete(q);
+        place(ed, t, se.rep, se.tie);
+        return true;
+      }
+    }
+    return false;
+  };
+  const addRepeat = p => {
+    const inc = (incident.get(p) || []).slice().sort((a, b) => {
+      const ac = isC(a.a) || isC(a.b), bc = isC(b.a) || isC(b.b);
+      if (ac !== bc) return ac ? -1 : 1;
+      return a.len - b.len;
+    });
+    const pSess = new Set(sessionsOf(p));
+    for (const ed of inc) {
+      for (let ti = 0; ti < sessions.length; ti++) {
+        if (pSess.has(ti)) continue;
+        if (!canPlace(ed, sessions[ti])) continue;
+        place(ed, sessions[ti], true, false);
+        return;
+      }
+    }
+    newSession(inc[0], true, false);
+  };
+  const unknowns = pts.map((p, i) => i).filter(isUnk).sort((a, b) => natCompare(pts[a].id, pts[b].id));
+  unknowns.forEach(p => {
+    if (!(incident.get(p) || []).length) return;
+    let guard = 0;
+    while (sessionsOf(p).length < 2 && guard++ < 20) {
+      const occ = sessionsOf(p);
+      if (!tryMove(p, occ[0])) addRepeat(p);
+    }
+  });
+  sessions = sessions.filter(s => s.edges.length);
+  fillSessions();
+  ensureRefTies();
+  triangulate();
+  fillSessions();
+  pruneE();
+  sessions = sessions.filter(s => s.edges.length);
+  rebuildIncident();
+
+  // 7. Sessiooni kestus (p 2.7.12) ja kontrollid
+  sessions.forEach(s => {
+    s.maxLen = Math.max(...s.edges.map(e => E.get(e.k).len));
+    s.dur = sessionDuration(s.maxLen);
+    s.refs = [...s.verts].filter(isRef);
+    s.recv = recvOf(s);
+    s.okRef = s.refs.length >= 2;
+    s.okVec = s.edges.length >= 3;
+    s.okLen = s.maxLen <= MAXLEN;
+  });
+
+  // Tulemuste koond
+  const edgeSessions = new Map();
+  sessions.forEach((s, i) => s.edges.forEach(e => {
+    if (!edgeSessions.has(e.k)) edgeSessions.set(e.k, []);
+    edgeSessions.get(e.k).push(i);
+  }));
+  const pointSess = pts.map((p, i) => {
+    const r = []; sessions.forEach((s, si) => { if (s.verts.has(i)) r.push(si); }); return r;
+  });
+  const pointRefs = pts.map((p, i) => isUnk(i) ? [...refsOf(i)] : []);
+  const figSess = figures.map(fig => {
+    const set = new Set();
+    const m = fig.closed ? fig.idx.length : fig.idx.length - 1;
+    for (let i = 0; i < m; i++) {
+      const k = ekey(fig.idx[i], fig.idx[(i + 1) % fig.idx.length]);
+      (edgeSessions.get(k) || []).forEach(si => set.add(si));
+    }
+    return set;
+  });
+
+  // p 2.7.11: määratavad punktid omavahel seotud (määratav–määratav vektorite graaf)
+  const par = new Map();
+  const find = x => { while (par.get(x) !== x) x = par.get(x); return x; };
+  pts.forEach((p, i) => par.set(i, i));
+  E.forEach(ed => { if (isUnk(ed.a) && isUnk(ed.b)) par.set(find(ed.a), find(ed.b)); });
+  const unkWithEdges = unknowns.filter(p => (incident.get(p) || []).length);
+  const comps = new Map();
+  unkWithEdges.forEach(p => { const r = find(p); if (!comps.has(r)) comps.set(r, []); comps.get(r).push(p); });
+  const unkNoField = unkWithEdges.filter(p => !(incident.get(p) || []).some(ed => isUnk(ed.a) && isUnk(ed.b)));
+  const connected = comps.size <= 1 && (unkNoField.length === 0 || unkWithEdges.length === 1);
+
+  // Võrgu kolmnurgad
+  const Afin = adjOf();
+  const triangles = [];
+  order.forEach((a, ia) => order.forEach((b, ib) => {
+    if (ib <= ia || !Afin.get(a).has(b)) return;
+    order.forEach((c, ic) => {
+      if (ic <= ib || !Afin.get(a).has(c) || !Afin.get(b).has(c)) return;
+      triangles.push([a, b, c]);
+    });
+  }));
+  const edgesNotInTri = [...E.values()].filter(ed => !inTriangle(ed, Afin));
+
+  const warnings = [];
+  if (droppedRefRef.length)
+    warnings.push("Kindelpunktide vahelised vektorid jäeti võrgust välja (RB nõue): " + droppedRefRef.join(", ") + ".");
+  pts.forEach((p, i) => {
+    if (!(incident.get(i) || []).length)
+      warnings.push((isRef(i) ? "Kindelpunkt " : "Punkt ") + p.id + " ei ole võrgus kasutusel" + (isRef(i) ? " (ükski määratav punkt ei ole temaga seotud)." : " — talle ei planeerita ühtegi vektorit."));
+  });
+  unknowns.forEach(p => {
+    if ((incident.get(p) || []).length && pointSess[p].length < 2)
+      warnings.push("Määratav punkt " + pts[p].id + " sai vaid " + pointSess[p].length + " sessiooni (p 2.7.15).");
+    if ((incident.get(p) || []).length && pointRefs[p].length < 2)
+      warnings.push("Määratav punkt " + pts[p].id + " on otse seotud vaid " + pointRefs[p].length + " kindelpunktiga (soovituslik ≥ 2) — pole kindelpunkti ≤ 25 km või vaba vastuvõtjat.");
+  });
+  if (unkWithEdges.length > 1) unkNoField.forEach(p => warnings.push("Määratav punkt " + pts[p].id + " ei ole seotud teiste määratavate punktidega (p 2.7.11)."));
+  if (comps.size > 1)
+    warnings.push("Määratavad punktid ei moodusta ühtset seotud võrku (p 2.7.11): " +
+      [...comps.values()].map(c => "{" + c.map(p => pts[p].id).join(", ") + "}").join(" ja ") + ". Lisa neid ühendavad vektorid.");
+  sessions.forEach((s, i) => {
+    if (!s.okRef) warnings.push("Sessioon " + (i + 1) + ": side vaid " + s.refs.length + " kindelpunktiga (p 2.7.10 nõuab ≥ 2) — lisa vastuvõtjaid, CORS-jaam või lähtepunkt ≤ 25 km kaugusel.");
+    if (!s.okVec) warnings.push("Sessioon " + (i + 1) + ": vaid " + s.edges.length + " mittetriviaalset vektorit (p 2.7.9 nõuab ≥ 3) — vaja vähemalt 4 samaaegset jaama.");
+  });
+  E.forEach(ed => {
+    if (ed.len > MAXLEN) warnings.push("Vektor " + pts[ed.a].id + " – " + pts[ed.b].id + " on " + (ed.len / 1000).toFixed(1) + " km (p 2.7.13 lubab max 25 km).");
+  });
+  edgesNotInTri.forEach(ed => warnings.push("Vektor " + pts[ed.a].id + " – " + pts[ed.b].id + " ei ole ühegi kolmnurga külg (p 2.7.17) — kolmnurga sulgemiseks pole sobivat määratavat punkti ≤ 25 km."));
+  figures.forEach((fig, fi) => {
+    if (fig.closed && !fig.dropped && figSess[fi].size === 1) warnings.push("Kujund " + fig.label + " sulgub ühe sessiooni vektoritest (triviaalne)!");
+  });
+  if (!pts.some((p, i) => isRef(i))) warnings.push("Võrgus pole ühtegi lähtepunkti ega CORS-jaama.");
+
+  const checks = [
+    { n: "RB", t: "Kindelpunktide (lähtepunktide / CORS) vahel vektoreid ei ole", ok: true, note: droppedRefRef.length ? droppedRefRef.length + " vektorit jäeti välja" : "" },
+    { n: "p 2.7.9", t: "Igas sessioonis ≥ 3 mittetriviaalset vektorit", ok: sessions.every(s => s.okVec) },
+    { n: "p 2.7.10", t: "Igas sessioonis side ≥ 2 kindelpunktiga (KP0 või CORS)", ok: sessions.every(s => s.okRef) },
+    { n: "p 2.7.11", t: "Määratavad punktid omavahel seotud mittetriviaalsete vektoritega", ok: connected && unkWithEdges.length === unknowns.length },
+    { n: "p 2.7.12", t: "Sessiooni kestus ≥ 90 min, pikendatud pikima vektori järgi", ok: true },
+    { n: "p 2.7.13", t: "Kõik vektorid ≤ 25 km", ok: [...E.values()].every(ed => ed.len <= MAXLEN) },
+    { n: "p 2.7.15", t: "Igas määratavas punktis ≥ 2 mõõtesessiooni", ok: unknowns.every(p => pointSess[p].length >= 2) },
+    { n: "RB", t: "Iga määratav punkt otse seotud ≥ 2 eri kindelpunktiga", ok: unknowns.every(p => pointRefs[p].length >= 2) },
+    { n: "p 2.7.17", t: "Võrk moodustab mittetriviaalsetest vektoritest kolmnurkadest lausvõrgu (iga vektor on kolmnurga külg)", ok: edgesNotInTri.length === 0 && triangles.length > 0 },
+    { n: "p 2.7.18", t: "Tasandus ainult mittetriviaalsetest vektoritest: sessiooni vektorid sõltumatud, iga kolmnurk ja kujund sulgub ≥ 2 eri sessiooni vektoritest", ok: figures.every((f, i) => !f.closed || f.dropped || figSess[i].size !== 1) }
+  ];
+
+  return {
+    pts: pts, R: R, sessions: sessions, figures: figures,
+    edges: [...E.values()], E: E, edgeSessions: edgeSessions,
+    pointSess: pointSess, pointRefs: pointRefs, figSess: figSess, triangles: triangles,
+    warnings: warnings, checks: checks, ekey: ekey
+  };
+}
+
+// Tingimustele vastav võrk: lähimad määratavad punktid + kindelpunktid kolmnurkadeks
+function generateFigures(pts){
+  const isC = i => pts[i].type === "cors" || pts[i].type === "base";
+  const isRef = i => pts[i].type !== "unknown";
+  const unk = pts.map((p, i) => i).filter(i => pts[i].type === "unknown");
+  const refs = pts.map((p, i) => i).filter(isRef);
+  if (!unk.length) throw "Võrgus pole ühtegi määratavat punkti";
+  if (!refs.length) throw "Võrgus pole ühtegi lähtepunkti ega CORS-jaama";
+  const dist = (a, b) => Math.hypot(pts[a].e - pts[b].e, pts[a].n - pts[b].n);
+  const key = (a, b) => (a < b ? a + "_" + b : b + "_" + a);
+  const sortIds = v => v.slice().sort((a, b) => natCompare(pts[a].id, pts[b].id));
+
+  // 1) Määratavate punktide vahelised vektorid: lühim ühendav puu + iga punkt oma 2 lähima naabriga
+  const pairs = [];
+  unk.forEach((a, i) => unk.forEach((b, j) => { if (j > i && dist(a, b) <= MAXLEN) pairs.push({ a: a, b: b, d: dist(a, b) }); }));
+  pairs.sort((x, y) => x.d - y.d);
+  const chosen = new Map();
+  const par = new Map(); unk.forEach(i => par.set(i, i));
+  const find = x => { while (par.get(x) !== x) x = par.get(x); return x; };
+  pairs.forEach(p => { if (find(p.a) !== find(p.b)) { par.set(find(p.a), find(p.b)); chosen.set(key(p.a, p.b), p); } });
+  unk.forEach(a => {
+    const nb = pairs.filter(p => p.a === a || p.b === a).slice(0, 2);
+    nb.forEach(p => chosen.set(key(p.a, p.b), p));
+  });
+
+  // 2) Igast määratav–määratav vektorist kolmnurk lähima kindelpunktiga
+  const figs = [], seen = new Set();
+  const addFig = v => { const k = sortIds(v).join("_"); if (!seen.has(k)) { seen.add(k); figs.push(v); } };
+  const refTies = new Map(); unk.forEach(i => refTies.set(i, new Set()));
+  const nearestRef = (a, b, exclude, preferCors) => {
+    let best = null, bd = Infinity;
+    refs.forEach(r => {
+      if (exclude && exclude.has(r)) return;
+      const da = dist(a, r), db = b === null ? 0 : dist(b, r);
+      if (da > MAXLEN || db > MAXLEN) return;
+      const d = (da + db) * (preferCors && !isC(r) ? 10 : 1);
+      if (d < bd) { bd = d; best = r; }
+    });
+    return best;
+  };
+  chosen.forEach(p => {
+    const r = nearestRef(p.a, p.b, null, false);
+    if (r === null) { addFig([p.a, p.b]); return; }
+    addFig([p.a, p.b, r]);
+    refTies.get(p.a).add(r); refTies.get(p.b).add(r);
+  });
+
+  // 3) Iga määratav punkt seotud >= 2 eri kindelpunktiga: kolmnurk lähima naabri ja järgmise kindelpunktiga
+  //    (eelistatult CORS – püsijaam ei kasuta vastuvõtjat)
+  unk.forEach(a => {
+    let g = 0;
+    while (refTies.get(a).size < 2 && g++ < 3) {
+      const nbs = pairs.filter(p => p.a === a || p.b === a).map(p => (p.a === a ? p.b : p.a));
+      const r = nearestRef(a, nbs.length ? nbs[0] : null, refTies.get(a), true);
+      if (r === null) break;
+      if (nbs.length) { addFig([a, nbs[0], r]); refTies.get(a).add(r); refTies.get(nbs[0]).add(r); }
+      else { addFig([a, r]); refTies.get(a).add(r); }
+    }
+  });
+
+  // 4) Kõik sisestatud kindelpunktid kasutusele: kasutamata kindelpunkt seotakse lähima
+  //    määratav–määratav vektoriga kolmnurgaks (mõlemad küljed <= 25 km)
+  const usedRefs = new Set();
+  refTies.forEach(set => set.forEach(r => usedRefs.add(r)));
+  refs.forEach(r => {
+    if (usedRefs.has(r)) return;
+    let best = null, bd = Infinity;
+    chosen.forEach(p => {
+      const da = dist(p.a, r), db = dist(p.b, r);
+      if (da > MAXLEN || db > MAXLEN) return;
+      if (da + db < bd) { bd = da + db; best = p; }
+    });
+    if (best) { addFig([best.a, best.b, r]); refTies.get(best.a).add(r); refTies.get(best.b).add(r); usedRefs.add(r); return; }
+    // Naabrita määratav punkt (üksik): üksik vektor
+    let ua = null, ud = Infinity;
+    unk.forEach(a => { const d = dist(a, r); if (d <= MAXLEN && d < ud) { ud = d; ua = a; } });
+    if (ua !== null) { addFig([ua, r]); refTies.get(ua).add(r); usedRefs.add(r); }
+  });
+
+  const sep = pts.some(p => /\s/.test(p.id)) ? "; " : " ";
+  const out = figs.map(v => sortIds(v));
+  out.sort((x, y) => natCompare(pts[x[0]].id, pts[y[0]].id) || natCompare(pts[x[1]].id, pts[y[1]].id) || natCompare(pts[x[2] === undefined ? x[0] : x[2]].id, pts[y[2] === undefined ? y[0] : y[2]].id));
+  return out.map(v => v.map(i => pts[i].id).join(sep)).join("\n");
+}
+
+// Näidisandmed: reaalne RB KP1 võrk (L-Est97)
+const SAMPLE_PTS = [
+"GEOS - Trimble VRS Now 5001; 6582759.454; 537632.967; CORS",
+"MUS2 - ESTPOS; 6587236.100; 539628.631; CORS",
+"Katku 1308; 6578484.826; 547697.847; LP",
+"LOKUTI97 6374; 6574614.860; 542469.000; LP",
+"Mõigu22 15331; 6583397.074; 545419.519; LP",
+"Pruuli-A 5231; 6573612.943; 542033.507; LP",
+"Pääsküla-94 526; 6578427.406; 535924.505; BAAS",
+"Saku 1359; 6572352.112; 537824.384; LP",
+"Tõdva 1363; 6571483.927; 540796.608; LP",
+"EE21-CP1-011; 6580754.924; 544960.734",
+"EE22-CP1-001; 6579715.052; 543864.899",
+"EE22-CP1-005; 6574574.135; 541271.783",
+"EE22-CP1-100; 6573309.825; 540149.532",
+"EE22-CP2-007; 6579115.436; 543606.929",
+"EE22-CP2-095; 6580549.823; 544666.336",
+"EE22-TEMP-060; 6578569.177; 543376.402",
+"EE22-TEMP-065; 6577824.544; 543348.027",
+"EE22-TEMP-070; 6577084.550; 543172.959",
+"EE22-TEMP-076; 6576261.677; 542834.830",
+"EE22-TEMP-081; 6575655.975; 542414.553",
+"EE-CP2-026R1; 6575020.654; 541845.231"].join("\n");
+
+function fillSample(){
+  document.getElementById("data").value = SAMPLE_PTS;
+  autoFigures();
+  document.getElementById("info").style.display = "none";
+}
+
+function autoFigures(){
+  const err = document.getElementById("err"), info = document.getElementById("info");
+  err.style.display = "none"; info.style.display = "none";
+  try {
+    const pts = parsePoints(document.getElementById("data").value);
+    const txt = generateFigures(pts);
+    document.getElementById("figs").value = txt;
+    const rows = txt.split("\n");
+    const nt = rows.filter(r => (r.indexOf(";") >= 0 ? r.split(";") : r.split(/\s+/)).length >= 3).length;
+    info.textContent = "Võrk genereeritud: " + nt + " kolmnurka" + (rows.length > nt ? " + " + (rows.length - nt) + " üksikvektorit" : "") +
+      " (" + pts.filter(p => p.type === "unknown").length + " määratavat punkti, kindelpunktide vahel vektoreid pole). Vajuta „Arvuta sessioonid“.";
+    info.style.display = "block";
+    document.getElementById("out").style.display = "none";
+    document.getElementById("dl").style.display = "none";
+  } catch(e) {
+    err.textContent = (typeof e === "string") ? e : ("Viga: " + (e && e.message ? e.message : e));
+    err.style.display = "block";
+  }
+}
+
+function sessColor(i, total){
+  const h = Math.round(360 * i / Math.max(total, 1));
+  return "hsl(" + h + ",68%,40%)";
+}
+function esc(s){
+  return String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+function fmtDur(m){ return m >= 60 ? Math.floor(m / 60) + " h " + (m % 60 ? (m % 60) + " min" : "") : m + " min"; }
+
+function run(){
+  const err = document.getElementById("err"), out = document.getElementById("out"),
+        warn = document.getElementById("warn");
+  err.style.display = "none"; warn.style.display = "none";
+  document.getElementById("info").style.display = "none";
+  try {
+    const pts = parsePoints(document.getElementById("data").value);
+    const idIndex = {};
+    pts.forEach((p, i) => { idIndex[p.id] = i; });
+    const figures = parseFigures(document.getElementById("figs").value, idIndex);
+    const R = parseInt(document.getElementById("recv").value, 10);
+    if (!isFinite(R)) throw "Sisesta vastuvõtjate arv";
+    const res = planSessions(pts, figures, R, { allCors: document.getElementById("allcors").checked });
+    render(res);
+    if (res.warnings.length) {
+      warn.innerHTML = "<b>Hoiatused:</b><br>" + res.warnings.map(esc).join("<br>");
+      warn.style.display = "block";
+    }
+    out.style.display = "block";
+    document.getElementById("dl").style.display = "inline-block";
+  } catch(e) {
+    err.textContent = (typeof e === "string") ? e : ("Viga: " + (e && e.message ? e.message : e));
+    err.style.display = "block";
+    out.style.display = "none";
+    document.getElementById("dl").style.display = "none";
+  }
+}
+
+function stat(v, lbl){ return '<div class="stat"><b>' + v + "</b><span>" + lbl + "</span></div>"; }
+const OK = '<span class="ok">&#10003;</span>', BAD = '<span class="bad">&#10007;</span>';
+
+function render(res){
+  const pts = res.pts, S = res.sessions.length;
+  const nKnown = pts.filter(p => p.type === "known" || p.type === "base").length;
+  const nCors = pts.filter(p => p.type === "cors").length;
+  const nUnk = pts.filter(p => p.type === "unknown").length;
+  const totalVec = res.sessions.reduce((a, s) => a + s.edges.length, 0);
+  const nRep = res.sessions.reduce((a, s) => a + s.edges.filter(e => e.rep).length, 0);
+  const nTie = res.sessions.reduce((a, s) => a + s.edges.filter(e => e.tie).length, 0);
+  const maxRecv = Math.max(...res.sessions.map(s => s.recv));
+  const totalDur = res.sessions.reduce((a, s) => a + s.dur, 0);
+
+  document.getElementById("stats").innerHTML =
+    stat(pts.length, "punkti") +
+    stat(nKnown + " / " + nCors + " / " + nUnk, "lähte / CORS / määratav") +
+    stat(res.triangles.length, "kolmnurka võrgus") +
+    stat(S, "sessiooni") +
+    stat(totalVec, "vektorit" + (nRep || nTie ? " (" + (nRep ? nRep + " kordust" : "") + (nRep && nTie ? ", " : "") + (nTie ? nTie + " lisatud sidet" : "") + ")" : "")) +
+    stat(maxRecv + " / " + res.R, "välivastuvõtjat kasutuses") +
+    stat(fmtDur(totalDur), "sessioonide min kogukestus");
+
+  document.getElementById("tblReq").innerHTML =
+    "<tr><th>Punkt</th><th>Nõue</th><th>Tulemus</th></tr>" +
+    res.checks.map(c => "<tr><td class='nw'>" + c.n + "</td><td>" + c.t + "</td><td>" +
+      (c.ok ? OK + " täidetud" : BAD + " <span class='bad'>ei ole täidetud</span> — vt hoiatusi") +
+      (c.note ? " <span class='note'>(" + esc(c.note) + ")</span>" : "") + "</td></tr>").join("");
+
+  document.getElementById("legend").innerHTML = res.sessions.map((s, i) =>
+    '<span class="chip"><span class="sw" style="background:' + sessColor(i, S) + '"></span>Sessioon ' + (i + 1) + "</span>"
+  ).join("");
+  document.getElementById("legend2").innerHTML =
+    '<span class="chip">&#9651; Lähtepunkt</span>' +
+    '<span class="chip">&#9650; Lähtepunkt-baasjaam</span>' +
+    '<span class="chip">&#9632; Püsijaam (CORS)</span>' +
+    '<span class="chip">&#9675; Määratav punkt</span>' +
+    '<span class="chip" style="color:var(--mut)">- - - kordusvektor</span>' +
+    '<span class="chip" style="color:var(--mut)">&mdash; peen joon = lisatud side</span>';
+
+  document.getElementById("plot").innerHTML = buildSvg(res);
+
+  // Sessioonide tabel
+  let h = "<tr><th>Sessioon</th><th>Punktid</th><th>Vastuv.</th><th>Kindelp.</th><th>Sõltumatud vektorid</th><th>Vekt.</th><th>Pikim</th><th>Min kestus</th></tr>";
+  res.sessions.forEach((s, i) => {
+    const vs = [...s.verts].sort((a, b) => natCompare(pts[a].id, pts[b].id));
+    const ids = vs.map(v => esc(pts[v].id) + (pts[v].type === "cors" ? " (CORS)" : pts[v].type === "base" ? " (BAAS)" : pts[v].type === "known" ? " (LP)" : "")).join(", ");
+    const vecs = s.edges.map(e =>
+      (e.tie ? '<span class="tie">' : "") + esc(pts[e.a].id) + " – " + esc(pts[e.b].id) + (e.tie ? "</span>" : "") +
+      (e.rep ? ' <span class="rep">(kordus)</span>' : "")
+    ).join("; ");
+    h += "<tr><td class='nw'><span class='dot' style='background:" + sessColor(i, S) + "'></span>Sessioon " + (i + 1) + "</td>" +
+         "<td>" + ids + "</td><td class='nw'>" + s.recv + " / " + res.R + "</td>" +
+         "<td class='nw'>" + s.refs.length + " " + (s.okRef ? OK : BAD) + "</td>" +
+         "<td>" + vecs + "</td><td class='nw'>" + s.edges.length + " " + (s.okVec ? OK : BAD) + "</td>" +
+         "<td class='nw'>" + (s.maxLen / 1000).toFixed(1) + " km" + (s.okLen ? "" : " " + BAD) + "</td>" +
+         "<td class='nw'>" + fmtDur(s.dur) + "</td></tr>";
+  });
+  document.getElementById("tbl").innerHTML = h;
+
+  // Punktide tabel
+  h = "<tr><th>Punkt</th><th>Tüüp</th><th>Sessioonid</th><th>Sessioone</th><th>Nõue p 2.7.15</th><th>Seotud kindelpunktid</th></tr>";
+  pts.map((p, i) => i).sort((a, b) => natCompare(pts[a].id, pts[b].id)).forEach(i => {
+    const p = pts[i], occ = res.pointSess[i];
+    let req = "&mdash;", refs = "&mdash;";
+    if (p.type === "unknown") {
+      req = occ.length >= 2 ? '<span class="ok">&#10003; &ge; 2</span>' : '<span class="bad">&#10007; alla 2</span>';
+      const rr = res.pointRefs[i];
+      refs = (rr.length >= 2 ? OK : BAD) + " " + rr.length + (rr.length ? ": " + rr.map(r => esc(pts[r].id)).join(", ") : "");
+    }
+    h += "<tr><td>" + esc(p.id) + "</td><td>" + TYPENAME[p.type] + "</td><td>" +
+         (occ.length ? occ.map(x => x + 1).join(", ") : "&mdash;") + "</td><td>" + occ.length + "</td><td>" + req + "</td><td>" + refs + "</td></tr>";
+  });
+  document.getElementById("tblPts").innerHTML = h;
+
+  // Kujundite tabel
+  h = "<tr><th>Kujund</th><th>Küljed (sessioon)</th><th>Eri sessioone</th><th>Sulgub mittetriviaalselt</th></tr>";
+  res.figures.forEach((fig, fi) => {
+    const parts = [];
+    const m = fig.closed ? fig.idx.length : fig.idx.length - 1;
+    for (let i = 0; i < m; i++) {
+      const a = fig.idx[i], b = fig.idx[(i + 1) % fig.idx.length];
+      const ss = res.edgeSessions.get(res.ekey(a, b)) || [];
+      parts.push(esc(pts[a].id) + " – " + esc(pts[b].id) + (ss.length ? " (S" + ss.map(x => x + 1).join(",S") + ")" : " <span class='note'>(välja jäetud)</span>"));
+    }
+    const n = res.figSess[fi].size;
+    const closedOk = fig.closed && !fig.dropped;
+    h += "<tr><td>" + esc(fig.label) + (fig.closed ? (fig.dropped ? ' <span class="note">(kindel–kindel külg välja jäetud, ei ole enam suletud)</span>' : "") : ' <span class="note">(üksik vektor)</span>') + "</td><td>" + parts.join("; ") + "</td><td>" + n + "</td><td>" +
+         (!closedOk ? "&mdash;" : n >= 2 ? OK : n === 0 ? "&mdash;" : BAD + " triviaalne") + "</td></tr>";
+  });
+  document.getElementById("tblFigs").innerHTML = h;
+}
+
+function symbol(p, x, y){
+  if (p.type === "base")
+    return '<path d="M ' + x + ' ' + (y - 7).toFixed(1) + ' L ' + (x - 6.5) + ' ' + (y + 5).toFixed(1) +
+           ' L ' + (+x + 6.5) + ' ' + (y + 5).toFixed(1) + ' Z" fill="#26303c" stroke="#26303c" stroke-width="1.7"/>';
+  if (p.type === "known")
+    return '<path d="M ' + x + ' ' + (y - 6.5).toFixed(1) + ' L ' + (x - 6) + ' ' + (y + 4.5).toFixed(1) +
+           ' L ' + (+x + 6) + ' ' + (y + 4.5).toFixed(1) + ' Z" fill="#fff" stroke="#26303c" stroke-width="1.7"/>';
+  if (p.type === "cors")
+    return '<rect x="' + (x - 4.8).toFixed(1) + '" y="' + (y - 4.8).toFixed(1) +
+           '" width="9.6" height="9.6" fill="#26303c" stroke="#26303c" stroke-width="1.4"/>';
+  return '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#fff" stroke="#26303c" stroke-width="1.6"/>';
+}
+
+function buildSvg(res){
+  const pts = res.pts, S = res.sessions.length;
+  let minE = Infinity, maxE = -Infinity, minN = Infinity, maxN = -Infinity;
+  pts.forEach(p => {
+    minE = Math.min(minE, p.e); maxE = Math.max(maxE, p.e);
+    minN = Math.min(minN, p.n); maxN = Math.max(maxN, p.n);
+  });
+  const dE = Math.max(maxE - minE, 1), dN = Math.max(maxN - minN, 1);
+  const W = 940, m = 70;
+  let k = (W - 2 * m) / dE;
+  let H = dN * k + 2 * m;
+  if (H > 1250) { k = (1250 - 2 * m) / dN; H = 1250; }
+  H = Math.max(H, 240);
+  const cx = (W - dE * k) / 2, cy = (H - dN * k) / 2;
+  const sx = p => cx + (p.e - minE) * k;
+  const sy = p => cy + (maxN - p.n) * k;
+
+  let g = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + W + " " + Math.round(H) + '" font-family="system-ui,sans-serif">';
+  res.triangles.forEach(t => {
+    g += '<polygon points="' +
+      t.map(i => sx(pts[i]).toFixed(1) + "," + sy(pts[i]).toFixed(1)).join(" ") +
+      '" fill="#64748b" opacity="0.06" stroke="#64748b" stroke-opacity="0.2" stroke-width="0.8"/>';
+  });
+  res.sessions.forEach((s, i) => {
+    const col = sessColor(i, S);
+    s.edges.forEach(ed => {
+      g += '<line x1="' + sx(pts[ed.a]).toFixed(1) + '" y1="' + sy(pts[ed.a]).toFixed(1) +
+           '" x2="' + sx(pts[ed.b]).toFixed(1) + '" y2="' + sy(pts[ed.b]).toFixed(1) +
+           '" stroke="' + col + '" stroke-width="' + (ed.tie ? "1.2" : "2.4") + '" stroke-linecap="round"' +
+           (ed.rep ? ' stroke-dasharray="7 5"' : "") + (ed.tie ? ' opacity="0.75"' : "") + '/>';
+    });
+  });
+  pts.forEach(p => {
+    const x = +sx(p).toFixed(1), y = +sy(p).toFixed(1);
+    g += symbol(p, x, y) +
+         '<text x="' + (x + 8).toFixed(1) + '" y="' + (y - 8).toFixed(1) +
+         '" font-size="11" fill="#1c2530" stroke="#ffffff" stroke-width="3" paint-order="stroke">' + esc(p.id) + "</text>";
+  });
+  const nx = W - 40, ny = 52;
+  g += '<line x1="' + nx + '" y1="' + ny + '" x2="' + nx + '" y2="' + (ny - 26) + '" stroke="#26303c" stroke-width="1.8"/>' +
+       '<polygon points="' + nx + "," + (ny - 32) + " " + (nx - 4) + "," + (ny - 22) + " " + (nx + 4) + "," + (ny - 22) + '" fill="#26303c"/>' +
+       '<text x="' + nx + '" y="' + (ny + 15) + '" font-size="12" text-anchor="middle" fill="#26303c">N</text>';
+  const rawBar = dE / 5;
+  const pow = Math.pow(10, Math.floor(Math.log10(rawBar)));
+  let bar = pow; for (const mlt of [1, 2, 5, 10]) if (mlt * pow <= rawBar) bar = mlt * pow;
+  const bpx = bar * k, bx = 55, by = Math.round(H) - 22;
+  g += '<line x1="' + bx + '" y1="' + by + '" x2="' + (bx + bpx).toFixed(1) + '" y2="' + by + '" stroke="#26303c" stroke-width="2"/>' +
+       '<line x1="' + bx + '" y1="' + (by - 5) + '" x2="' + bx + '" y2="' + (by + 5) + '" stroke="#26303c" stroke-width="2"/>' +
+       '<line x1="' + (bx + bpx).toFixed(1) + '" y1="' + (by - 5) + '" x2="' + (bx + bpx).toFixed(1) + '" y2="' + (by + 5) + '" stroke="#26303c" stroke-width="2"/>' +
+       '<text x="' + (bx + bpx / 2).toFixed(1) + '" y="' + (by - 9) + '" font-size="12" text-anchor="middle" fill="#26303c">' +
+       (bar >= 1000 ? (bar / 1000) + " km" : bar + " m") + "</text>";
+  g += "</svg>";
+  return g;
+}
+
+function downloadSvg(){
+  const el = document.getElementById("plot");
+  if (!el.firstChild) return;
+  const blob = new Blob([el.innerHTML], { type: "image/svg+xml" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "gnss-sessioonid.svg";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+if (typeof module !== "undefined") module.exports = { parsePoints, parseFigures, planSessions, generateFigures, sessionDuration, SAMPLE_PTS };
+</script>
+</body>
+</html>

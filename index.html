@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Satelliitgeodeesia</title>
-<meta name="description" content="Õppeaine Satelliitgeodeesia koduleht: teemad, materjalid ja arvutustööriistad.">
+<meta name="description" content="Õppeaine MI.2043 Satelliitgeodeesia koduleht: õppeaine info, materjalid ja arvutustööriistad.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -56,7 +56,7 @@ body{
   line-height:1.6;
 }
 .wrap{max-width:860px;margin:0 auto;padding:28px 20px 56px}
-.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;font-size:14px}
+.topnav{display:flex;align-items:baseline;gap:18px;margin-bottom:26px;font-size:14px;flex-wrap:wrap}
 .topnav .site{font-family:"IBM Plex Mono",monospace;font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:12px;color:var(--muted);margin-right:auto}
 .topnav a{color:var(--accent-ink);text-decoration:none;border-bottom:1px solid transparent;padding-bottom:2px}
 .topnav a:hover{border-bottom-color:var(--accent-ink)}
@@ -94,6 +94,10 @@ h2::after{content:"";flex:1;height:1px;background:var(--line)}
 }
 .toolcard .t::after{content:" →"}
 .toolcard .d{font-size:14px;color:var(--muted);margin-top:4px;max-width:65ch}
+.toolcard .m{
+  font-size:12.5px;color:var(--muted);margin-top:8px;
+  font-family:"IBM Plex Mono",monospace;
+}
 
 .edit{
   margin-top:10px;padding:10px 12px;
@@ -105,17 +109,18 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
 </head>
 <body>
 <div class="wrap">
-<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html" aria-current="page">Avaleht</a><a href="kalkulaator.html">Kepler → ECEF</a><a href="tsykli-libisemine.html">Tsükli libisemine</a></nav>
+<nav class="topnav"><span class="site">Satelliitgeodeesia</span><a href="index.html" aria-current="page">Avaleht</a><a href="kalkulaator.html">Kepler → ECEF</a><a href="tsykli-libisemine.html">Tsükli libisemine</a><a href="gnss-sessiooniplaneerija.html">GNSS sessioonid</a></nav>
 
 <header class="mast">
   <h1>Satelliitgeodeesia</h1>
-  <p class="sub">Õppeaine koduleht · loengumaterjalid ja tööriistad</p>
+  <p class="sub">MI.2043 · õppeaine koduleht · materjalid ja tööriistad</p>
 </header>
 
 <main>
 <h2>Õppeainest</h2>
 <p>Õppeaine käsitleb satelliitidel põhinevaid geodeetilisi mõõtmis- ja positsioneerimismeetodeid: GNSS süsteemide (GPS, GLONASS, Galileo, BeiDou) ülesehitust, satelliitide orbiidimehaanikat, signaale ja vaatlussuurusi, koordinaat- ja ajasüsteeme ning GNSS vaatluste töötlemist geodeetilise täpsuse saavutamiseks.</p>
-<div class="edit">Toimeta see tutvustus oma ainekava järgi — lisa ainekood, maht (EAP), semester ja hindamise põhimõtted.</div>
+
+<p>Õppeaine MI.2043 Satelliitgeodeesia on mõeldud EMÜ magistriõppekava „Geodeesia ja ruumiandmete hõive” üliõpilastele. Aine maht on 5 EAP. Õppeaine toimub üks kord õppeaastas sügissemestril sessioonõppe vormis.</p>
 
 <h2>Tööriistad</h2>
 <a class="toolcard" href="kalkulaator.html">
@@ -126,10 +131,19 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
   <span class="t">Tsüklilibisemise labor</span>
   <p class="d">Vii reaalsetesse GPS faasivaatlustesse kunstlik tsükli libisemine ja uuri, millised lineaarkombinatsioonid (L1, L1−P1, LC−PC, LI−PI, LI, Melbourne–Wübbena) selle nähtavaks teevad. Sisaldab hüppe ja müra arvulist võrdlust ning kontrollküsimusi.</p>
 </a>
+<a class="toolcard" href="gnss-sessiooniplaneerija.html">
+  <span class="t">GNSS sessioonide planeerija</span>
+  <p class="d">Planeeri staatiliste GNSS-mõõtmiste sessioonid: sisesta punktid L-Est97 koordinaatidega, määra võrgu kujundid või lase need automaatselt genereerida ning saa sessioonide jaotus, kestused, võrgu joonis ja nõuete kontroll. Arvestab Rail Baltica geodeesia eritingimuste KP1 võrgu nõudeid.</p>
+</a>
 
 <h2>Materjalid</h2>
+<a class="toolcard" href="GNSS_Eopik.pdf">
+  <span class="t">GNSS – globaalne satelliitnavigatsioonisüsteem geodeetilise täpsusega asukohamääranguks</span>
+  <p class="d">Eestikeelne kõrgkooliõpik, mis katab õppeaine kogu ainekava: GNSS süsteemide ülesehituse, signaalid ja vaatlussuurused, koordinaat- ja ajasüsteemid, vigade allikad ning mõõtmis- ja töötlusmeetodid geodeetilise täpsusega asukohamääranguks.</p>
+  <p class="m">Ellmann, Kall, Kollo, Liibusk · Tartu 2022 · 394 lk · PDF</p>
+</a>
 <p>Loengukonspektid, praktikumide juhendid ja andmefailid lisatakse siia jooksvalt semestri vältel.</p>
-<div class="edit">Lisa siia lingid oma materjalidele — PDF-failid võid panna samasse GitHubi repositooriumisse (nt kausta <code>materjalid/</code>) ja linkida kujul <code>&lt;a href="materjalid/loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
+<div class="edit">Lisa siia lingid ülejäänud materjalidele — lohista PDF-fail repositooriumisse teiste failide kõrvale ja lingi kujul <code>&lt;a href="loeng1.pdf"&gt;Loeng 1&lt;/a&gt;</code>.</div>
 
 <h2>Kontakt</h2>
 <p>Õppejõud: Tarmo Kall — küsimused loengus, praktikumis või e-posti teel.</p>
@@ -143,7 +157,7 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
     'E-post: <a href="mailto:' + a + '">' + a + "</a>";
 })();
 </script>
-<div class="edit">Täienda soovi korral ametinime ja vastuvõtuaegadega.</div>
+<p>Teadustöö ja publikatsioonid: <a href="https://www.etis.ee/CV/Tarmo_Kall" target="_blank" rel="noopener">CV Eesti Teadusinfosüsteemis</a>.</p>
 </main>
 
 <footer>Satelliitgeodeesia · õppeotstarbeline leht</footer>
