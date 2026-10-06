@@ -109,6 +109,13 @@ h2::after{content:"";flex:1;height:1px;background:var(--line)}
   font-size:13px;color:var(--muted);
 }
 footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px}
+footer p{margin:0 0 8px;max-width:78ch}
+footer p:last-child{margin-bottom:0}
+footer a{color:var(--accent-ink)}
+.cc{display:flex;align-items:flex-start;gap:10px}
+.cc svg{flex:none;margin-top:2px}
+.cc svg circle{fill:none;stroke:currentColor;stroke-width:1.6}
+.cc svg path,.cc svg text{fill:currentColor}
 </style>
 </head>
 <body>
@@ -165,7 +172,25 @@ footer{margin-top:44px;font-size:13px;color:var(--muted);border-top:1px solid va
 <p>Teadustöö ja publikatsioonid: <a href="https://www.etis.ee/CV/Tarmo_Kall" target="_blank" rel="noopener">CV Eesti Teadusinfosüsteemis</a>.</p>
 </main>
 
-<footer>Satelliitgeodeesia · õppeotstarbeline leht</footer>
+<footer>
+  <p class="cc">
+    <svg width="76" height="27" viewBox="0 0 76 27" role="img" aria-label="CC BY-SA">
+      <circle cx="13.5" cy="13.5" r="12.7"/>
+      <text x="13.5" y="18" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" text-anchor="middle">CC</text>
+      <circle cx="38" cy="13.5" r="12.7"/>
+      <text x="38" y="18" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" text-anchor="middle">BY</text>
+      <circle cx="62.5" cy="13.5" r="12.7"/>
+      <text x="62.5" y="18" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="600" text-anchor="middle">SA</text>
+    </svg>
+    <span>Selle lehe tekst ja siinsed arvutustööriistad: © 2026 Tarmo Kall. Litsentsitud litsentsiga
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.et" target="_blank" rel="license noopener">Creative Commons Attribution-ShareAlike 4.0 International (CC&nbsp;BY-SA&nbsp;4.0)</a>.
+    Materjali tohib vabalt kasutada, kohandada ja edasi levitada tingimusel, et viidatakse autorile
+    ja tuletatud teos avaldatakse sama litsentsi all.</span>
+  </p>
+  <p>Litsents ei laiene õpikule „GNSS – globaalne satelliitnavigatsioonisüsteem geodeetilise täpsusega
+  asukohamääranguks” ega selle kaanepildile — õpiku autoriõigus kuulub autoritele (Ellmann, Kall, Kollo,
+  Liibusk, 2022) ja kaanepildi aluseks on Euroopa Kosmoseagentuuri kujutis (© ESA – P. Carril).</p>
+</footer>
 </div>
 </body>
 </html>
